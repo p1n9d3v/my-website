@@ -9,6 +9,7 @@
         "lint": "next lint"
     },
     "dependencies": {
+        "clsx": "^2.1.1",
         "next": "15.4.2",
         "react": "19.1.0",
         "react-dom": "19.1.0"
@@ -23,6 +24,7 @@
         "eslint": "^9.31.0",
         "eslint-config-next": "15.4.2",
         "eslint-plugin-perfectionist": "^4.15.0",
+        "tailwind-merge": "^3.3.1",
         "tailwindcss": "^4",
         "typescript": "^5"
     }
