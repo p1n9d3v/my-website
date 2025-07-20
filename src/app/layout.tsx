@@ -14,9 +14,9 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en">
+        <html lang="en" className="">
             <body className={`${openSans.className}  antialiased`}>
-                {children}
+                <main className="min-h-screen light">{children}</main>
             </body>
         </html>
     );

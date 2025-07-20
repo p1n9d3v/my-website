@@ -1,3 +1,11 @@
+import WallPaper from './_components/WallPaper';
+
 export default function Home() {
-    return <div className="font-medium">Z z</div>;
+    return (
+        <>
+            <p>Hello world!</p>
+
+            <WallPaper />
+        </>
+    );
 }
