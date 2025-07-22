@@ -10,11 +10,11 @@ interface OSLayoutProps {
 
 export default function Layout({ children }: OSLayoutProps) {
     return (
-        <>
+        <div className="h-screen w-screen relative overflow-hidden">
             <MenuBar />
             {children}
             <Dock />
             <WallPaper />
-        </>
+        </div>
     );
 }
