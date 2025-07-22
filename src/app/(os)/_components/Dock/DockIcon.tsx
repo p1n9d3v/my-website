@@ -1,62 +1,14 @@
-'use client';
-import {
-    Folder,
-    User,
-    Briefcase,
-    FileText,
-    Terminal,
-    Mail,
-    Trash2,
-    Settings,
-    Music,
-} from 'lucide-react';
 import { useState } from 'react';
 
 import { cn } from '@/utils/cn';
 
-interface DockApp {
-    id: string;
-    icon: React.ComponentType<{ className?: string }>;
-    name: string;
-    isRunning: boolean;
+import type { DockApp } from '../../_types';
+
+interface DockIconProps {
+    app: DockApp;
 }
 
-export default function Dock() {
-    const dockApps: DockApp[] = [
-        { id: 'finder', icon: Folder, name: 'Finder', isRunning: false },
-        { id: 'about', icon: User, name: 'About Me', isRunning: false },
-        {
-            id: 'portfolio',
-            icon: Briefcase,
-            name: 'Portfolio',
-            isRunning: true,
-        },
-        { id: 'blog', icon: FileText, name: 'Blog', isRunning: false },
-        { id: 'terminal', icon: Terminal, name: 'Terminal', isRunning: true },
-        { id: 'contact', icon: Mail, name: 'Contact', isRunning: false },
-        { id: 'music', icon: Music, name: 'Music', isRunning: false },
-        { id: 'settings', icon: Settings, name: 'Settings', isRunning: false },
-        { id: 'trash', icon: Trash2, name: 'Trash', isRunning: false },
-    ];
-
-    return (
-        <div
-            className={cn(
-                'fixed bottom-4 left-1/2 transform -translate-x-1/2 z-40',
-                'bg-white/10 backdrop-blur-md border border-white/20',
-                'rounded-2xl shadow-lg shadow-black/20',
-            )}
-        >
-            <div className="flex items-end gap-2 px-4 py-3">
-                {dockApps.map((app) => (
-                    <DockIcon key={app.id} app={app} />
-                ))}
-            </div>
-        </div>
-    );
-}
-
-const DockIcon = ({ app }: { app: DockApp }) => {
+export default function DockIcon({ app }: DockIconProps) {
     const [isHovered, setIsHovered] = useState(false);
     const IconComponent = app.icon;
 
@@ -90,6 +42,7 @@ const DockIcon = ({ app }: { app: DockApp }) => {
                 </div>
             )}
 
+            {/* 앱 버튼 */}
             <button
                 onClick={() => handleAppClick(app)}
                 onContextMenu={(e) => handleAppRightClick(e, app)}
@@ -125,4 +78,4 @@ const DockIcon = ({ app }: { app: DockApp }) => {
             )}
         </div>
     );
-};
+}
