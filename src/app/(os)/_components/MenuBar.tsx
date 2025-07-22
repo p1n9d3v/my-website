@@ -59,12 +59,8 @@ export default function MenuBar() {
                 'bg-black/20 backdrop-blur-md border-b border-white/10',
             )}
         >
-            <div
-                className={cn('flex items-center justify-between h-full px-4')}
-            >
-                {/* 좌측 영역 */}
+            <div className="flex items-center justify-between h-full px-4">
                 <div className="flex items-center space-x-4">
-                    {/* Apple 로고 */}
                     <button
                         onClick={handleAppleMenuClick}
                         className={cn(buttonStyles, 'px-2')}
@@ -73,14 +69,9 @@ export default function MenuBar() {
                         <Circle className="w-3 h-3 fill-current" />
                     </button>
 
-                    <span
-                        className={cn('text-sm font-medium', 'hidden sm:block')}
-                    >
-                        P1n9
-                    </span>
+                    <span className="text-sm font-medium">P1n9</span>
 
-                    {/* 메뉴 항목들 */}
-                    <nav className="hidden md:flex items-center space-x-1">
+                    <nav className="flex items-center space-x-1">
                         {menuItems.map((item) => (
                             <button
                                 key={item.label}
@@ -93,9 +84,7 @@ export default function MenuBar() {
                     </nav>
                 </div>
 
-                {/* 우측 상태 영역 */}
                 <div className="flex items-center gap-x-3">
-                    {/* 시간 및 날짜 */}
                     <div
                         className={cn(
                             'flex items-center gap-2',
@@ -103,10 +92,9 @@ export default function MenuBar() {
                         )}
                     >
                         <div>{currentTime}</div>
-                        <div className={cn('text-xs')}>{currentDate}</div>
+                        <div className="text-xs">{currentDate}</div>
                     </div>
 
-                    {/* Spotlight 검색 */}
                     <button
                         onClick={handleSpotlightClick}
                         className={buttonStyles}
@@ -116,7 +104,6 @@ export default function MenuBar() {
                         <Search className="w-4 h-4" />
                     </button>
 
-                    {/* 제어센터 */}
                     <button
                         className={buttonStyles}
                         title="제어"

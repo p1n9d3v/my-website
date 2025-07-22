@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 
+import Dock from './_components/Dock';
 import MenuBar from './_components/MenuBar';
 import WallPaper from './_components/WallPaper';
 
@@ -12,6 +13,7 @@ export default function Layout({ children }: OSLayoutProps) {
         <>
             <MenuBar />
             {children}
+            <Dock />
             <WallPaper />
         </>
     );
