@@ -1,10 +1,13 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import Draggable from 'react-draggable';
 
 import { cn } from '@/utils/cn';
 
+import type { Position, Size } from '../../_types';
+
+import { MIN_HEIGHT, MIN_WIDTH } from '../../_constants';
 import WindowTitleBar from './WindowTitleBar';
 
 interface WindowProps {
@@ -12,12 +15,9 @@ interface WindowProps {
     title: string;
     children: React.ReactNode;
     isActive?: boolean;
-    position?: { x: number; y: number };
-    size?: { width: number; height: number };
+    position?: Position;
+    size?: Size;
 }
-
-const MIN_WIDTH = 300;
-const MIN_HEIGHT = 300;
 
 export default function Window({
     title,

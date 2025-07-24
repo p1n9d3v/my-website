@@ -1,35 +1,35 @@
+'use client';
+
+import { nanoid } from 'nanoid';
+
 import Window from './_components/Window';
+import { useWindowStore } from './_store/window';
 
 export default function Page() {
+    const windows = useWindowStore((state) => state.windows);
+    const registerWindow = useWindowStore((state) => state.registerWindow);
+
+    const handleRegisterProcess = () => {
+        registerWindow({
+            name: '프로세스 이름',
+            id: nanoid(),
+        });
+    };
+
     return (
         <>
-            <p className="text-2xl dark:text-green-500">Hello world!</p>
-            <Window
-                title="새 창"
-                size={{ width: 400, height: 300 }}
-                position={{ x: 100, y: 100 }}
-                id="new-window"
-            >
-                <p className="text-xl dark:text-green-500">새 창 내용</p>
-            </Window>
-
-            <Window
-                title="새 창"
-                size={{ width: 400, height: 300 }}
-                position={{ x: 50, y: 100 }}
-                id="new-window"
-            >
-                <p className="text-xl dark:text-green-500">새 창 내용</p>
-            </Window>
-
-            <Window
-                title="새 창"
-                size={{ width: 400, height: 300 }}
-                position={{ x: 40, y: 100 }}
-                id="new-window"
-            >
-                <p className="text-xl dark:text-green-500">새 창 내용</p>
-            </Window>
+            <button onClick={handleRegisterProcess}>Test1</button>
+            {Object.values(windows).map((window) => (
+                <Window
+                    key={window.id}
+                    title={window.process.name}
+                    size={window.size}
+                    position={window.position}
+                    id={window.id}
+                >
+                    <p className="text-xl dark:text-green-500">Funcking</p>
+                </Window>
+            ))}
         </>
     );
 }
