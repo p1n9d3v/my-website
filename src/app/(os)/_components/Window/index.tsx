@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Draggable from 'react-draggable';
 
 import { cn } from '@/utils/cn';
@@ -38,8 +38,8 @@ export default function Window({
 
     //NOTE: Resize
     useEffect(() => {
-        const resizableEle = nodeRef.current;
-        if (!resizableEle) return;
+        const resizableEl = nodeRef.current;
+        if (!resizableEl) return;
 
         let initialMouseX = 0;
         let initialMouseY = 0;
@@ -87,12 +87,12 @@ export default function Window({
             const dx = event.clientX - initialMouseX;
             const newWidth = initialElemWidth + dx;
             if (newWidth >= MIN_WIDTH) {
-                resizableEle.style.width = `${newWidth}px`;
+                resizableEl.style.width = `${newWidth}px`;
             }
         };
         const handleMouseDownRightResize = (event: MouseEvent) => {
             initialMouseX = event.clientX;
-            const styles = window.getComputedStyle(resizableEle);
+            const styles = window.getComputedStyle(resizableEl);
             initialElemWidth = parseInt(styles.width, 10);
             document.addEventListener('mousemove', handleMouseMoveRightResize);
             document.addEventListener('mouseup', handleMouseUp);
@@ -105,13 +105,13 @@ export default function Window({
             const newTop = initialElemTop - dy;
 
             if (newHeight >= MIN_HEIGHT) {
-                resizableEle.style.height = `${newHeight}px`;
-                resizableEle.style.top = `${newTop}px`;
+                resizableEl.style.height = `${newHeight}px`;
+                resizableEl.style.top = `${newTop}px`;
             }
         };
         const handleMouseDownTopResize = (event: MouseEvent) => {
             initialMouseY = event.clientY;
-            const styles = window.getComputedStyle(resizableEle);
+            const styles = window.getComputedStyle(resizableEl);
             initialElemHeight = parseInt(styles.height, 10);
             initialElemTop = parseInt(styles.top, 10);
             document.addEventListener('mousemove', handleMouseMoveTopResize);
@@ -123,12 +123,12 @@ export default function Window({
             const dy = event.clientY - initialMouseY;
             const newHeight = initialElemHeight + dy;
             if (newHeight >= MIN_HEIGHT) {
-                resizableEle.style.height = `${newHeight}px`;
+                resizableEl.style.height = `${newHeight}px`;
             }
         };
         const handleMouseDownBottomResize = (event: MouseEvent) => {
             initialMouseY = event.clientY;
-            const styles = window.getComputedStyle(resizableEle);
+            const styles = window.getComputedStyle(resizableEl);
             initialElemHeight = parseInt(styles.height, 10);
             document.addEventListener('mousemove', handleMouseMoveBottomResize);
             document.addEventListener('mouseup', handleMouseUp);
@@ -140,13 +140,13 @@ export default function Window({
             const newWidth = initialElemWidth + dx;
             const newLeft = initialElemLeft - dx;
             if (newWidth >= MIN_WIDTH) {
-                resizableEle.style.width = `${newWidth}px`;
-                resizableEle.style.left = `${newLeft}px`;
+                resizableEl.style.width = `${newWidth}px`;
+                resizableEl.style.left = `${newLeft}px`;
             }
         };
         const handleMouseDownLeftResize = (event: MouseEvent) => {
             initialMouseX = event.clientX;
-            const styles = window.getComputedStyle(resizableEle);
+            const styles = window.getComputedStyle(resizableEl);
             initialElemWidth = parseInt(styles.width, 10);
             initialElemLeft = parseInt(styles.left, 10);
             document.addEventListener('mousemove', handleMouseMoveLeftResize);
@@ -164,18 +164,18 @@ export default function Window({
             const newTop = initialElemTop - dy;
 
             if (newWidth >= MIN_WIDTH) {
-                resizableEle.style.width = `${newWidth}px`;
-                resizableEle.style.left = `${newLeft}px`;
+                resizableEl.style.width = `${newWidth}px`;
+                resizableEl.style.left = `${newLeft}px`;
             }
             if (newHeight >= MIN_HEIGHT) {
-                resizableEle.style.height = `${newHeight}px`;
-                resizableEle.style.top = `${newTop}px`;
+                resizableEl.style.height = `${newHeight}px`;
+                resizableEl.style.top = `${newTop}px`;
             }
         };
         const handleMouseDownLeftTopResize = (event: MouseEvent) => {
             initialMouseX = event.clientX;
             initialMouseY = event.clientY;
-            const styles = window.getComputedStyle(resizableEle);
+            const styles = window.getComputedStyle(resizableEl);
             initialElemWidth = parseInt(styles.width, 10);
             initialElemHeight = parseInt(styles.height, 10);
             initialElemLeft = parseInt(styles.left, 10);
@@ -197,17 +197,17 @@ export default function Window({
             const newTop = initialElemTop - dy;
 
             if (newWidth >= MIN_WIDTH) {
-                resizableEle.style.width = `${newWidth}px`;
+                resizableEl.style.width = `${newWidth}px`;
             }
             if (newHeight >= MIN_HEIGHT) {
-                resizableEle.style.height = `${newHeight}px`;
-                resizableEle.style.top = `${newTop}px`;
+                resizableEl.style.height = `${newHeight}px`;
+                resizableEl.style.top = `${newTop}px`;
             }
         };
         const handleMouseDownRightTopResize = (event: MouseEvent) => {
             initialMouseX = event.clientX;
             initialMouseY = event.clientY;
-            const styles = window.getComputedStyle(resizableEle);
+            const styles = window.getComputedStyle(resizableEl);
             initialElemWidth = parseInt(styles.width, 10);
             initialElemHeight = parseInt(styles.height, 10);
             initialElemLeft = parseInt(styles.left, 10); // right 기준이므로 left는 mousedown 시점에만 필요
@@ -228,16 +228,16 @@ export default function Window({
             const newHeight = initialElemHeight + dy;
 
             if (newWidth >= MIN_WIDTH) {
-                resizableEle.style.width = `${newWidth}px`;
+                resizableEl.style.width = `${newWidth}px`;
             }
             if (newHeight >= MIN_HEIGHT) {
-                resizableEle.style.height = `${newHeight}px`;
+                resizableEl.style.height = `${newHeight}px`;
             }
         };
         const handleMouseDownRightBottomResize = (event: MouseEvent) => {
             initialMouseX = event.clientX;
             initialMouseY = event.clientY;
-            const styles = window.getComputedStyle(resizableEle);
+            const styles = window.getComputedStyle(resizableEl);
             initialElemWidth = parseInt(styles.width, 10);
             initialElemHeight = parseInt(styles.height, 10);
             document.addEventListener(
@@ -257,17 +257,17 @@ export default function Window({
             const newHeight = initialElemHeight + dy;
 
             if (newWidth >= MIN_WIDTH) {
-                resizableEle.style.width = `${newWidth}px`;
-                resizableEle.style.left = `${newLeft}px`;
+                resizableEl.style.width = `${newWidth}px`;
+                resizableEl.style.left = `${newLeft}px`;
             }
             if (newHeight >= MIN_HEIGHT) {
-                resizableEle.style.height = `${newHeight}px`;
+                resizableEl.style.height = `${newHeight}px`;
             }
         };
         const handleMouseDownLeftBottomResize = (event: MouseEvent) => {
             initialMouseX = event.clientX;
             initialMouseY = event.clientY;
-            const styles = window.getComputedStyle(resizableEle);
+            const styles = window.getComputedStyle(resizableEl);
             initialElemWidth = parseInt(styles.width, 10);
             initialElemHeight = parseInt(styles.height, 10);
             initialElemLeft = parseInt(styles.left, 10);
@@ -333,7 +333,7 @@ export default function Window({
                 className={cn(
                     'absolute',
                     'bg-black/30 backdrop-blur-sm',
-                    'rounded-lg shadow-2xl border border-white/20',
+                    'rounded-lg border border-white/20 shadow-2xl',
                     'overflow-hidden',
                     isActive ? 'z-50' : 'z-40',
                 )}
@@ -345,16 +345,16 @@ export default function Window({
                 <WindowTitleBar title={title} className="window-title-bar" />
 
                 {/* 컨텐츠 영역 */}
-                <div className="p-4 h-[calc(100%-2rem)] overflow-auto">
+                <div className="h-[calc(100%-2rem)] overflow-auto p-4">
                     {children}
                 </div>
                 <div
                     ref={leftRef}
-                    className="absolute left-0 top-0 h-full  w-1 cursor-w-resize"
+                    className="absolute top-0 left-0 h-full w-1 cursor-w-resize"
                 />
                 <div
                     ref={rightRef}
-                    className="absolute right-0 top-0  h-full w-1 cursor-e-resize"
+                    className="absolute top-0 right-0 h-full w-1 cursor-e-resize"
                 />
                 <div
                     ref={topRef}
@@ -366,19 +366,19 @@ export default function Window({
                 />
                 <div
                     ref={leftTopRef}
-                    className="absolute top-0 left-0 h-2 w-2 rounded-full cursor-nw-resize"
+                    className="absolute top-0 left-0 h-2 w-2 cursor-nw-resize rounded-full"
                 />
                 <div
                     ref={rightTopRef}
-                    className="absolute top-0 right-0 h-2 w-2 rounded-full cursor-ne-resize"
+                    className="absolute top-0 right-0 h-2 w-2 cursor-ne-resize rounded-full"
                 />
                 <div
                     ref={leftBottomRef}
-                    className="absolute bottom-0 left-0 h-2 w-2 rounded-full cursor-sw-resize"
+                    className="absolute bottom-0 left-0 h-2 w-2 cursor-sw-resize rounded-full"
                 />
                 <div
                     ref={rightBottomRef}
-                    className="absolute bottom-0 right-0 h-2 w-2 rounded-full cursor-se-resize"
+                    className="absolute right-0 bottom-0 h-2 w-2 cursor-se-resize rounded-full"
                 />
             </div>
         </Draggable>

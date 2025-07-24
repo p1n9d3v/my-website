@@ -39,8 +39,8 @@ export default function Dock() {
     return (
         <div
             className={cn(
-                'fixed bottom-4 left-1/2 transform -translate-x-1/2 z-40',
-                'bg-white/10 backdrop-blur-md border border-white/20',
+                'fixed bottom-2.5 left-1/2 z-40 -translate-x-1/2 transform',
+                'border border-white/20 bg-white/10 backdrop-blur-md',
                 'rounded-2xl shadow-lg shadow-black/20',
             )}
         >
