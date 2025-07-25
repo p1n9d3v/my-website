@@ -1,15 +1,12 @@
 'use client';
 
-import type { DraggableData, DraggableEvent } from 'react-draggable';
-
-import { useCallback, useRef } from 'react';
+import { useRef, useState } from 'react';
 import Draggable from 'react-draggable';
 
 import { cn } from '@/utils/cn';
 
 import type { Position, Size } from '../../_types';
 
-import { MIN_HEIGHT, MIN_WIDTH } from '../../_constants';
 import useWindowResize from '../../_hooks/useWindowResize';
 import { useWindowStore } from '../../_store/window';
 import WindowTitleBar from './WindowTitleBar';
@@ -20,7 +17,6 @@ interface WindowProps {
     children: React.ReactNode;
     position: Position;
     size: Size;
-    isMaximized: boolean;
     zIndex: number;
 }
 
@@ -28,24 +24,16 @@ export default function Window({
     id,
     title,
     children,
-    position = { x: 100, y: 100 },
+    position,
     size,
     zIndex = 0,
-    isMaximized = false,
 }: WindowProps) {
     const nodeRef = useRef<HTMLDivElement>(null);
-    const positionRef = useRef<{ x: number; y: number }>({
-        x: position.x,
-        y: position.y,
-    });
+    const [isMaximized, setIsMaximized] = useState(false);
+    const prevTransform = useRef<string>('');
+    const prevSize = useRef<Size>(size);
 
     const { closeWindow, activateWindow, updateWindowRect } = useWindowStore();
-    const handleUpdate = useCallback(
-        (bounds: Partial<Position & Size>) => {
-            updateWindowRect(id, bounds);
-        },
-        [id, updateWindowRect],
-    );
 
     const {
         leftRef,
@@ -58,46 +46,64 @@ export default function Window({
         rightBottomRef,
     } = useWindowResize({
         ref: nodeRef,
-        onUpdate: handleUpdate,
     });
-
-    const handleDrag = (_: DraggableEvent, data: DraggableData) => {
-        positionRef.current.x = data.x;
-        positionRef.current.y = data.y;
-    };
 
     const handleCloseWindow = () => closeWindow(id);
     const handleClickWindow = () => activateWindow(id);
+
     const handleMaximizeWindow = () => {
         const workspaceEl = document.querySelector('.workspace');
         if (!workspaceEl) return;
 
-        const bounds = workspaceEl.getBoundingClientRect();
+        const workspaceBounds = workspaceEl.getBoundingClientRect();
         const nodeEl = nodeRef.current;
 
         if (!nodeEl) return;
-        nodeEl.style.width = `${bounds.width}px`;
-        nodeEl.style.height = `${bounds.height}px`;
-        positionRef.current.x = 0;
-        positionRef.current.y = 0;
+
+        prevSize.current = {
+            width: nodeEl.clientWidth,
+            height: nodeEl.clientHeight,
+        };
+        nodeEl.style.width = `${workspaceBounds.width}px`;
+        nodeEl.style.height = `${workspaceBounds.height}px`;
+
+        const nodeTransform = window.getComputedStyle(nodeEl).transform;
+        prevTransform.current = nodeTransform;
+
+        //NOTE: Draggable 컴포넌트가 transform 속성을 사용하기 때문에 변경된 resize를 통해 변경된 left,top에 대한 보정 처리
+        const transformMatrix = new DOMMatrix(nodeTransform);
+        const translateX = transformMatrix.m41;
+        const translateY = transformMatrix.m42;
+
+        const nodeBounds = nodeEl.getBoundingClientRect();
+
+        const newTranslateX = translateX - nodeBounds.x;
+        const newTranslateY = translateY - nodeBounds.y + 40;
+
+        nodeEl.style.transform = `translate(${newTranslateX}px, ${newTranslateY}px)`;
+
+        setIsMaximized(true);
     };
 
-    const handleMinimizeWindow = () => {
+    const handleRestoreWindow = () => {
         const nodeEl = nodeRef.current;
         if (!nodeEl) return;
 
-        nodeEl.style.width = `${MIN_WIDTH}px`;
-        nodeEl.style.height = `${MIN_HEIGHT}px`;
-        positionRef.current.x = window.innerWidth / 2 - MIN_WIDTH / 2;
-        positionRef.current.y = window.innerHeight / 2 - MIN_HEIGHT / 2;
+        nodeEl.style.width = `${prevSize.current.width}px`;
+        nodeEl.style.height = `${prevSize.current.height}px`;
+
+        nodeEl.style.transform = prevTransform.current;
+
+        setIsMaximized(false);
     };
 
     return (
         <Draggable
             nodeRef={nodeRef}
             handle=".window-title-bar"
-            position={positionRef.current}
-            onDrag={handleDrag}
+            bounds=".workspace"
+            defaultPosition={position}
+            defaultClassName="left-0 top-0"
         >
             <div
                 ref={nodeRef}
@@ -120,7 +126,7 @@ export default function Window({
                     isMaximized={isMaximized}
                     onClose={handleCloseWindow}
                     onMaximize={handleMaximizeWindow}
-                    onMinimize={handleMinimizeWindow}
+                    onRestore={handleRestoreWindow}
                 />
 
                 {/* 컨텐츠 영역 */}

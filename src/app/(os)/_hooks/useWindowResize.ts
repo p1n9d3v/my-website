@@ -1,18 +1,12 @@
 import { useEffect, useRef, type RefObject } from 'react';
 
-import type { Position, Size } from '../_types';
-
 import { MIN_HEIGHT, MIN_WIDTH } from '../_constants';
 
 interface UseWindowResizeProps {
     ref: RefObject<HTMLDivElement | null>;
-    onUpdate?: (bounds: Partial<Position & Size>) => void;
 }
 
-export default function useWindowResize({
-    ref,
-    onUpdate,
-}: UseWindowResizeProps) {
+export default function useWindowResize({ ref }: UseWindowResizeProps) {
     const leftRef = useRef<HTMLDivElement>(null);
     const rightRef = useRef<HTMLDivElement>(null);
     const topRef = useRef<HTMLDivElement>(null);
@@ -63,14 +57,6 @@ export default function useWindowResize({
                 'mousemove',
                 handleMouseMoveLeftBottomResize,
             );
-
-            const nodeBounds = resizableEl.getBoundingClientRect();
-            onUpdate?.({
-                width: nodeBounds.width,
-                height: nodeBounds.height,
-                x: nodeBounds.x,
-                y: nodeBounds.y,
-            });
 
             //NOTE: handleMouseUp도 제거
             document.removeEventListener('mouseup', handleMouseUp);

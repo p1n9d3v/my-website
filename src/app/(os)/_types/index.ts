@@ -22,7 +22,6 @@ export interface Window {
     position: Position;
     process: Process;
     zIndex: number;
-    isMaximized: boolean;
     size: Size;
 }
 

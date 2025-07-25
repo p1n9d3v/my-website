@@ -6,14 +6,16 @@ interface WindowControlsProps {
     onClose?: () => void;
     onMinimize?: () => void;
     onMaximize?: () => void;
-    showIcons?: boolean;
+    onRestore?: () => void;
+    isMaximized: boolean;
 }
 
 export default function WindowControls({
     onClose,
     onMinimize,
     onMaximize,
-    showIcons = false,
+    onRestore,
+    isMaximized,
 }: WindowControlsProps) {
     return (
         <div className="group flex items-center gap-2">
@@ -27,13 +29,11 @@ export default function WindowControls({
                 )}
                 title="닫기"
             >
-                {showIcons && (
-                    <X
-                        size={10}
-                        className="text-black opacity-0 transition-opacity group-hover:opacity-100"
-                        strokeWidth={3}
-                    />
-                )}
+                <X
+                    size={10}
+                    className="text-black opacity-0 transition-opacity group-hover:opacity-100"
+                    strokeWidth={3}
+                />
             </button>
 
             {/* 최소화 버튼 */}
@@ -46,18 +46,16 @@ export default function WindowControls({
                 )}
                 title="최소화"
             >
-                {showIcons && (
-                    <Minus
-                        size={10}
-                        className="text-black opacity-0 transition-opacity group-hover:opacity-100"
-                        strokeWidth={3}
-                    />
-                )}
+                <Minus
+                    size={10}
+                    className="text-black opacity-0 transition-opacity group-hover:opacity-100"
+                    strokeWidth={3}
+                />
             </button>
 
-            {/* 최대화 버튼 */}
+            {/* 최대화/최소화 버튼 */}
             <button
-                onClick={onMaximize}
+                onClick={isMaximized ? onRestore : onMaximize}
                 className={cn(
                     'h-3 w-3 rounded-full bg-green-500',
                     'transition-colors hover:bg-green-600',
@@ -65,13 +63,11 @@ export default function WindowControls({
                 )}
                 title="최대화"
             >
-                {showIcons && (
-                    <ChevronsLeftRight
-                        size={10}
-                        className="rotate-45 text-black opacity-0 transition-opacity group-hover:opacity-100"
-                        strokeWidth={3}
-                    />
-                )}
+                <ChevronsLeftRight
+                    size={10}
+                    className="rotate-45 text-black opacity-0 transition-opacity group-hover:opacity-100"
+                    strokeWidth={3}
+                />
             </button>
         </div>
     );

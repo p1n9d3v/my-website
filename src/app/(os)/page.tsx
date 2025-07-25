@@ -25,6 +25,7 @@ export default function Page() {
                     size={window.size}
                     position={window.position}
                     id={window.id}
+                    zIndex={window.zIndex}
                 >
                     <p className="text-xl dark:text-green-500">Funcking</p>
                 </Window>

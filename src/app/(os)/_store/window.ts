@@ -45,7 +45,6 @@ export const useWindowStore = create<WindowStoreStates & WindowStoreActions>()(
                     size,
                     process,
                     zIndex: state.zIndexCounter,
-                    isMaximized: false,
                 };
                 state.zIndexCounter++;
             });
