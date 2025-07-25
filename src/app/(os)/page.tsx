@@ -6,8 +6,7 @@ import Window from './_components/Window';
 import { useWindowStore } from './_store/window';
 
 export default function Page() {
-    const windows = useWindowStore((state) => state.windows);
-    const registerWindow = useWindowStore((state) => state.registerWindow);
+    const { windows, registerWindow } = useWindowStore();
 
     const handleRegisterProcess = () => {
         registerWindow({

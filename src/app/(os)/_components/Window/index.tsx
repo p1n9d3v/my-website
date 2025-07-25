@@ -8,6 +8,7 @@ import { cn } from '@/utils/cn';
 import type { Position, Size } from '../../_types';
 
 import { MIN_HEIGHT, MIN_WIDTH } from '../../_constants';
+import { useWindowStore } from '../../_store/window';
 import WindowTitleBar from './WindowTitleBar';
 
 interface WindowProps {
@@ -20,6 +21,7 @@ interface WindowProps {
 }
 
 export default function Window({
+    id,
     title,
     children,
     isActive = true,
@@ -36,6 +38,9 @@ export default function Window({
     const leftBottomRef = useRef<HTMLDivElement>(null);
     const rightBottomRef = useRef<HTMLDivElement>(null);
 
+    const { closeWindow } = useWindowStore();
+
+    const handleCloseWindow = () => closeWindow(id);
     //NOTE: Resize
     useEffect(() => {
         const resizableEl = nodeRef.current;
@@ -342,7 +347,11 @@ export default function Window({
                     height: size.height,
                 }}
             >
-                <WindowTitleBar title={title} className="window-title-bar" />
+                <WindowTitleBar
+                    title={title}
+                    className="window-title-bar"
+                    onClose={handleCloseWindow}
+                />
 
                 {/* 컨텐츠 영역 */}
                 <div className="h-[calc(100%-2rem)] overflow-auto p-4">

@@ -47,6 +47,11 @@ export const useWindowStore = create<WindowStoreStates & WindowStoreActions>()(
         },
         updateWindowRect: (windowId, bounds) => {},
         activateWindow: (windowId) => {},
-        closeWindow: (windowId) => {},
+        closeWindow: (windowId) => {
+            set((state) => {
+                const { [windowId]: _, ...rest } = state.windows;
+                return { windows: rest };
+            });
+        },
     })),
 );
