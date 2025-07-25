@@ -1,12 +1,18 @@
 import { useEffect, useRef, type RefObject } from 'react';
 
+import type { Position, Size } from '../_types';
+
 import { MIN_HEIGHT, MIN_WIDTH } from '../_constants';
 
 interface UseWindowResizeProps {
     ref: RefObject<HTMLDivElement | null>;
+    onUpdate?: (bounds: Partial<Position & Size>) => void;
 }
 
-export default function useWindowResize({ ref }: UseWindowResizeProps) {
+export default function useWindowResize({
+    ref,
+    onUpdate,
+}: UseWindowResizeProps) {
     const leftRef = useRef<HTMLDivElement>(null);
     const rightRef = useRef<HTMLDivElement>(null);
     const topRef = useRef<HTMLDivElement>(null);
@@ -58,6 +64,15 @@ export default function useWindowResize({ ref }: UseWindowResizeProps) {
                 handleMouseMoveLeftBottomResize,
             );
 
+            const nodeBounds = resizableEl.getBoundingClientRect();
+            onUpdate?.({
+                width: nodeBounds.width,
+                height: nodeBounds.height,
+                x: nodeBounds.x,
+                y: nodeBounds.y,
+            });
+
+            //NOTE: handleMouseUp도 제거
             document.removeEventListener('mouseup', handleMouseUp);
         };
 
@@ -69,6 +84,7 @@ export default function useWindowResize({ ref }: UseWindowResizeProps) {
                 resizableEl.style.width = `${newWidth}px`;
             }
         };
+
         const handleMouseDownRightResize = (event: MouseEvent) => {
             initialMouseX = event.clientX;
             const styles = window.getComputedStyle(resizableEl);
@@ -88,6 +104,7 @@ export default function useWindowResize({ ref }: UseWindowResizeProps) {
                 resizableEl.style.top = `${newTop}px`;
             }
         };
+
         const handleMouseDownTopResize = (event: MouseEvent) => {
             initialMouseY = event.clientY;
             const styles = window.getComputedStyle(resizableEl);
@@ -105,6 +122,7 @@ export default function useWindowResize({ ref }: UseWindowResizeProps) {
                 resizableEl.style.height = `${newHeight}px`;
             }
         };
+
         const handleMouseDownBottomResize = (event: MouseEvent) => {
             initialMouseY = event.clientY;
             const styles = window.getComputedStyle(resizableEl);
@@ -123,6 +141,7 @@ export default function useWindowResize({ ref }: UseWindowResizeProps) {
                 resizableEl.style.left = `${newLeft}px`;
             }
         };
+
         const handleMouseDownLeftResize = (event: MouseEvent) => {
             initialMouseX = event.clientX;
             const styles = window.getComputedStyle(resizableEl);
@@ -151,6 +170,7 @@ export default function useWindowResize({ ref }: UseWindowResizeProps) {
                 resizableEl.style.top = `${newTop}px`;
             }
         };
+
         const handleMouseDownLeftTopResize = (event: MouseEvent) => {
             initialMouseX = event.clientX;
             initialMouseY = event.clientY;
@@ -183,6 +203,7 @@ export default function useWindowResize({ ref }: UseWindowResizeProps) {
                 resizableEl.style.top = `${newTop}px`;
             }
         };
+
         const handleMouseDownRightTopResize = (event: MouseEvent) => {
             initialMouseX = event.clientX;
             initialMouseY = event.clientY;
@@ -213,6 +234,7 @@ export default function useWindowResize({ ref }: UseWindowResizeProps) {
                 resizableEl.style.height = `${newHeight}px`;
             }
         };
+
         const handleMouseDownRightBottomResize = (event: MouseEvent) => {
             initialMouseX = event.clientX;
             initialMouseY = event.clientY;
@@ -243,6 +265,7 @@ export default function useWindowResize({ ref }: UseWindowResizeProps) {
                 resizableEl.style.height = `${newHeight}px`;
             }
         };
+
         const handleMouseDownLeftBottomResize = (event: MouseEvent) => {
             initialMouseX = event.clientX;
             initialMouseY = event.clientY;

@@ -20,8 +20,10 @@ export interface Size {
 export interface Window {
     id: string;
     position: Position;
-    size: Size;
     process: Process;
+    zIndex: number;
+    isMaximized: boolean;
+    size: Size;
 }
 
 export interface Process {
