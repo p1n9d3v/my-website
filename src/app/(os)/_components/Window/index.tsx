@@ -8,7 +8,7 @@ import { cn } from '@/utils/cn';
 import type { Position, Size } from '../../_types';
 
 import useWindowResize from '../../_hooks/useWindowResize';
-import { useWindowStore } from '../../_store/window';
+import { useOSStore } from '../../_store';
 import WindowHeader from './WindowHeader';
 
 interface WindowProps {
@@ -36,7 +36,7 @@ export default function Window({
     const prevTransform = useRef<string>('');
     const prevSize = useRef<Size>(size);
 
-    const { closeWindow, activateWindow, hideWindow } = useWindowStore();
+    const { closeWindow, activateWindow, hideWindow } = useOSStore();
 
     const {
         leftRef,

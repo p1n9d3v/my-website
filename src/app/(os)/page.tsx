@@ -3,10 +3,10 @@
 import { nanoid } from 'nanoid';
 
 import Window from './_components/Window';
-import { useWindowStore } from './_store/window';
+import { useOSStore } from './_store';
 
 export default function Page() {
-    const { windows, registerWindow } = useWindowStore();
+    const { windows, registerWindow } = useOSStore();
 
     const handleRegisterProcess = () => {
         registerWindow({
