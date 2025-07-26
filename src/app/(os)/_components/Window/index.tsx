@@ -18,6 +18,7 @@ interface WindowProps {
     position: Position;
     size: Size;
     zIndex: number;
+    isHide: boolean;
 }
 
 export default function Window({
@@ -26,6 +27,7 @@ export default function Window({
     children,
     position,
     size,
+    isHide,
     zIndex = 0,
 }: WindowProps) {
     const [isMaximized, setIsMaximized] = useState(false);
@@ -34,7 +36,7 @@ export default function Window({
     const prevTransform = useRef<string>('');
     const prevSize = useRef<Size>(size);
 
-    const { closeWindow, activateWindow } = useWindowStore();
+    const { closeWindow, activateWindow, hideWindow } = useWindowStore();
 
     const {
         leftRef,
@@ -52,6 +54,7 @@ export default function Window({
 
     const handleCloseWindow = () => closeWindow(id);
     const handleClickWindow = () => activateWindow(id);
+    const handleHideWindow = () => hideWindow(id);
 
     const handleMaximizeWindow = () => {
         const workspaceEl = document.querySelector('.workspace');
@@ -105,7 +108,13 @@ export default function Window({
             handle=".window-title-bar"
             bounds=".workspace"
             defaultPosition={position}
-            defaultClassName="left-0 top-0"
+            defaultClassName={cn('left-0 top-0', isHide && 'invisible')}
+            onDrag={() => {
+                document.body.style.cursor = 'grabbing';
+            }}
+            onStop={() => {
+                document.body.style.cursor = 'default';
+            }}
         >
             <div
                 ref={nodeRef}
@@ -129,6 +138,7 @@ export default function Window({
                     onClose={handleCloseWindow}
                     onMaximize={handleMaximizeWindow}
                     onRestore={handleRestoreWindow}
+                    onHide={handleHideWindow}
                 />
 
                 {/* 컨텐츠 영역 */}

@@ -23,6 +23,7 @@ export interface Window {
     process: Process;
     zIndex: number;
     size: Size;
+    isHide: boolean;
 }
 
 export interface Process {

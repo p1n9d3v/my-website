@@ -16,6 +16,7 @@ interface WindowStoreActions {
     registerWindow: (process: { name: string; id: string }) => void;
     activateWindow: (windowId: string) => void;
     closeWindow: (windowId: string) => void;
+    hideWindow: (windowId: string) => void;
 }
 
 export const useWindowStore = create<WindowStoreStates & WindowStoreActions>()(
@@ -41,8 +42,14 @@ export const useWindowStore = create<WindowStoreStates & WindowStoreActions>()(
                     size,
                     process,
                     zIndex: state.zIndexCounter,
+                    isHide: false,
                 };
                 state.zIndexCounter++;
+            });
+        },
+        hideWindow: (windowId) => {
+            set((state) => {
+                state.windows[windowId].isHide = true;
             });
         },
         activateWindow: (windowId) => {

@@ -7,9 +7,9 @@ interface WindowHeaderProps {
     className: string;
     isMaximized: boolean;
     onClose?: () => void;
-    onMinimize?: () => void;
     onMaximize?: () => void;
     onRestore?: () => void;
+    onHide?: () => void;
 }
 
 export default function WindowHeader({
@@ -17,16 +17,16 @@ export default function WindowHeader({
     className,
     isMaximized,
     onClose,
-    onMinimize,
     onRestore,
     onMaximize,
+    onHide,
 }: WindowHeaderProps) {
     return (
         <div
             className={cn(
                 'h-8 rounded-t-lg bg-gray-700/20',
                 'flex items-center justify-between px-3',
-                'cursor-move select-none',
+                'select-none',
                 'border-b border-white/10',
                 className,
             )}
@@ -36,9 +36,9 @@ export default function WindowHeader({
                 <WindowControls
                     isMaximized={isMaximized}
                     onClose={onClose}
-                    onMinimize={onMinimize}
                     onMaximize={onMaximize}
                     onRestore={onRestore}
+                    onHide={onHide}
                 />
             </div>
 

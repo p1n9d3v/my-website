@@ -1,10 +1,10 @@
-import { ChevronsLeftRight, Minus, X } from 'lucide-react';
+import { Minus, X, Minimize2, Maximize2 } from 'lucide-react';
 
 import { cn } from '@/utils/cn';
 
 interface WindowControlsProps {
     onClose?: () => void;
-    onMinimize?: () => void;
+    onHide?: () => void;
     onMaximize?: () => void;
     onRestore?: () => void;
     isMaximized: boolean;
@@ -12,7 +12,7 @@ interface WindowControlsProps {
 
 export default function WindowControls({
     onClose,
-    onMinimize,
+    onHide,
     onMaximize,
     onRestore,
     isMaximized,
@@ -36,9 +36,9 @@ export default function WindowControls({
                 />
             </button>
 
-            {/* 최소화 버튼 */}
+            {/* 숨김 버튼 */}
             <button
-                onClick={onMinimize}
+                onClick={onHide}
                 className={cn(
                     'h-3 w-3 rounded-full bg-yellow-500',
                     'transition-colors hover:bg-yellow-600',
@@ -61,13 +61,21 @@ export default function WindowControls({
                     'transition-colors hover:bg-green-600',
                     'flex items-center justify-center',
                 )}
-                title="최대화"
+                title={isMaximized ? '최소화' : '최대화'}
             >
-                <ChevronsLeftRight
-                    size={10}
-                    className="rotate-45 text-black opacity-0 transition-opacity group-hover:opacity-100"
-                    strokeWidth={3}
-                />
+                {isMaximized ? (
+                    <Minimize2
+                        size={10}
+                        className="text-black opacity-0 transition-opacity group-hover:opacity-100"
+                        strokeWidth={3}
+                    />
+                ) : (
+                    <Maximize2
+                        size={10}
+                        className="text-black opacity-0 transition-opacity group-hover:opacity-100"
+                        strokeWidth={3}
+                    />
+                )}
             </button>
         </div>
     );
