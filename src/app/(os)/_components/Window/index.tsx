@@ -9,7 +9,7 @@ import type { Position, Size } from '../../_types';
 
 import useWindowResize from '../../_hooks/useWindowResize';
 import { useWindowStore } from '../../_store/window';
-import WindowTitleBar from './WindowTitleBar';
+import WindowHeader from './WindowHeader';
 
 interface WindowProps {
     id: string;
@@ -122,7 +122,7 @@ export default function Window({
                 }}
                 onClick={handleClickWindow}
             >
-                <WindowTitleBar
+                <WindowHeader
                     title={title}
                     className="window-title-bar"
                     isMaximized={isMaximized}

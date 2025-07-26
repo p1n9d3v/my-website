@@ -2,7 +2,7 @@ import { cn } from '@/utils/cn';
 
 import WindowControls from './WindowControls';
 
-interface WindowTitleBarProps {
+interface WindowHeaderProps {
     title: string;
     className: string;
     isMaximized: boolean;
@@ -12,7 +12,7 @@ interface WindowTitleBarProps {
     onRestore?: () => void;
 }
 
-export default function WindowTitleBar({
+export default function WindowHeader({
     title,
     className,
     isMaximized,
@@ -20,7 +20,7 @@ export default function WindowTitleBar({
     onMinimize,
     onRestore,
     onMaximize,
-}: WindowTitleBarProps) {
+}: WindowHeaderProps) {
     return (
         <div
             className={cn(
