@@ -19,15 +19,7 @@ export default function Page() {
         <>
             <button onClick={handleRegisterProcess}>Test1</button>
             {Object.values(windows).map((window) => (
-                <Window
-                    key={window.id}
-                    title={window.process.name}
-                    size={window.size}
-                    position={window.position}
-                    id={window.id}
-                    isHide={window.isHide}
-                    zIndex={window.zIndex}
-                >
+                <Window key={window.id} window={window}>
                     <p className="text-xl dark:text-green-500">Funcking</p>
                 </Window>
             ))}

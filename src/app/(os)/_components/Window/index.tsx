@@ -1,35 +1,26 @@
 'use client';
 
+import type { ReactNode } from 'react';
+
 import { useRef, useState } from 'react';
 import Draggable from 'react-draggable';
 
 import { cn } from '@/utils/cn';
 
-import type { Position, Size } from '../../_types';
+import type { Size, Window } from '../../_types';
 
 import useWindowResize from '../../_hooks/useWindowResize';
 import { useOSStore } from '../../_store';
 import WindowHeader from './WindowHeader';
 
 interface WindowProps {
-    id: string;
-    title: string;
-    children: React.ReactNode;
-    position: Position;
-    size: Size;
-    zIndex: number;
-    isHide: boolean;
+    window: Window;
+    children: ReactNode;
 }
 
-export default function Window({
-    id,
-    title,
-    children,
-    position,
-    size,
-    isHide,
-    zIndex = 0,
-}: WindowProps) {
+export default function Window({ window: osWindow, children }: WindowProps) {
+    const { id, process, position, size, isHide, zIndex } = osWindow;
+
     const [isMaximized, setIsMaximized] = useState(false);
 
     const nodeRef = useRef<HTMLDivElement>(null);
@@ -107,6 +98,7 @@ export default function Window({
             nodeRef={nodeRef}
             handle=".window-title-bar"
             bounds=".workspace"
+            disabled={isMaximized}
             defaultPosition={position}
             defaultClassName={cn('left-0 top-0', isHide && 'invisible')}
             onDrag={() => {
@@ -132,7 +124,7 @@ export default function Window({
                 onClick={handleClickWindow}
             >
                 <WindowHeader
-                    title={title}
+                    title={process.name}
                     className="window-title-bar"
                     isMaximized={isMaximized}
                     onClose={handleCloseWindow}
