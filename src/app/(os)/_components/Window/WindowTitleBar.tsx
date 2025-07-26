@@ -10,7 +10,6 @@ interface WindowTitleBarProps {
     onMinimize?: () => void;
     onMaximize?: () => void;
     onRestore?: () => void;
-    onDragStart?: (e: React.MouseEvent) => void;
 }
 
 export default function WindowTitleBar({
@@ -21,7 +20,6 @@ export default function WindowTitleBar({
     onMinimize,
     onRestore,
     onMaximize,
-    onDragStart,
 }: WindowTitleBarProps) {
     return (
         <div
@@ -32,7 +30,6 @@ export default function WindowTitleBar({
                 'border-b border-white/10',
                 className,
             )}
-            onMouseDown={onDragStart}
         >
             {/* 왼쪽: 컨트롤 버튼 */}
             <div className="cursor-default">

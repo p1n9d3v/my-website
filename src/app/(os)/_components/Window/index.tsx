@@ -28,12 +28,13 @@ export default function Window({
     size,
     zIndex = 0,
 }: WindowProps) {
-    const nodeRef = useRef<HTMLDivElement>(null);
     const [isMaximized, setIsMaximized] = useState(false);
+
+    const nodeRef = useRef<HTMLDivElement>(null);
     const prevTransform = useRef<string>('');
     const prevSize = useRef<Size>(size);
 
-    const { closeWindow, activateWindow, updateWindowRect } = useWindowStore();
+    const { closeWindow, activateWindow } = useWindowStore();
 
     const {
         leftRef,
@@ -46,6 +47,7 @@ export default function Window({
         rightBottomRef,
     } = useWindowResize({
         ref: nodeRef,
+        workspace: '.workspace',
     });
 
     const handleCloseWindow = () => closeWindow(id);

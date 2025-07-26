@@ -4,9 +4,13 @@ import { MIN_HEIGHT, MIN_WIDTH } from '../_constants';
 
 interface UseWindowResizeProps {
     ref: RefObject<HTMLDivElement | null>;
+    workspace: string;
 }
 
-export default function useWindowResize({ ref }: UseWindowResizeProps) {
+export default function useWindowResize({
+    ref,
+    workspace,
+}: UseWindowResizeProps) {
     const leftRef = useRef<HTMLDivElement>(null);
     const rightRef = useRef<HTMLDivElement>(null);
     const topRef = useRef<HTMLDivElement>(null);
@@ -16,16 +20,17 @@ export default function useWindowResize({ ref }: UseWindowResizeProps) {
     const leftBottomRef = useRef<HTMLDivElement>(null);
     const rightBottomRef = useRef<HTMLDivElement>(null);
 
+    const initialMouseX = useRef(0);
+    const initialMouseY = useRef(0);
+    const initialElemWidth = useRef(0);
+    const initialElemHeight = useRef(0);
+    const initialElemLeft = useRef(0);
+    const initialElemTop = useRef(0);
+
     useEffect(() => {
         const resizableEl = ref.current;
-        if (!resizableEl) return;
-
-        let initialMouseX = 0;
-        let initialMouseY = 0;
-        let initialElemWidth = 0;
-        let initialElemHeight = 0;
-        let initialElemLeft = 0;
-        let initialElemTop = 0;
+        const workspaceEl = document.querySelector(workspace);
+        if (!resizableEl || !workspaceEl) return;
 
         const handleMouseUp = () => {
             document.removeEventListener(
@@ -58,32 +63,32 @@ export default function useWindowResize({ ref }: UseWindowResizeProps) {
                 handleMouseMoveLeftBottomResize,
             );
 
-            //NOTE: handleMouseUp도 제거
             document.removeEventListener('mouseup', handleMouseUp);
         };
 
-        //NOTE: RIGHT
+        // NOTE: RIGHT
         const handleMouseMoveRightResize = (event: MouseEvent) => {
-            const dx = event.clientX - initialMouseX;
-            const newWidth = initialElemWidth + dx;
+            const dx = event.clientX - initialMouseX.current;
+            const newWidth = initialElemWidth.current + dx;
+
             if (newWidth >= MIN_WIDTH) {
                 resizableEl.style.width = `${newWidth}px`;
             }
         };
 
         const handleMouseDownRightResize = (event: MouseEvent) => {
-            initialMouseX = event.clientX;
+            initialMouseX.current = event.clientX;
             const styles = window.getComputedStyle(resizableEl);
-            initialElemWidth = parseInt(styles.width, 10);
+            initialElemWidth.current = parseInt(styles.width, 10);
             document.addEventListener('mousemove', handleMouseMoveRightResize);
             document.addEventListener('mouseup', handleMouseUp);
         };
 
-        //NOTE: TOP
+        // NOTE: TOP
         const handleMouseMoveTopResize = (event: MouseEvent) => {
-            const dy = initialMouseY - event.clientY;
-            const newHeight = initialElemHeight + dy;
-            const newTop = initialElemTop - dy;
+            const dy = initialMouseY.current - event.clientY;
+            const newHeight = initialElemHeight.current + dy;
+            const newTop = initialElemTop.current - dy;
 
             if (newHeight >= MIN_HEIGHT) {
                 resizableEl.style.height = `${newHeight}px`;
@@ -92,36 +97,38 @@ export default function useWindowResize({ ref }: UseWindowResizeProps) {
         };
 
         const handleMouseDownTopResize = (event: MouseEvent) => {
-            initialMouseY = event.clientY;
+            initialMouseY.current = event.clientY;
             const styles = window.getComputedStyle(resizableEl);
-            initialElemHeight = parseInt(styles.height, 10);
-            initialElemTop = parseInt(styles.top, 10);
+            initialElemHeight.current = parseInt(styles.height, 10);
+            initialElemTop.current = parseInt(styles.top, 10);
             document.addEventListener('mousemove', handleMouseMoveTopResize);
             document.addEventListener('mouseup', handleMouseUp);
         };
 
-        //NOTE: BOTTOM
+        // NOTE: BOTTOM
         const handleMouseMoveBottomResize = (event: MouseEvent) => {
-            const dy = event.clientY - initialMouseY;
-            const newHeight = initialElemHeight + dy;
+            const dy = event.clientY - initialMouseY.current;
+            const newHeight = initialElemHeight.current + dy;
+
             if (newHeight >= MIN_HEIGHT) {
                 resizableEl.style.height = `${newHeight}px`;
             }
         };
 
         const handleMouseDownBottomResize = (event: MouseEvent) => {
-            initialMouseY = event.clientY;
+            initialMouseY.current = event.clientY;
             const styles = window.getComputedStyle(resizableEl);
-            initialElemHeight = parseInt(styles.height, 10);
+            initialElemHeight.current = parseInt(styles.height, 10);
             document.addEventListener('mousemove', handleMouseMoveBottomResize);
             document.addEventListener('mouseup', handleMouseUp);
         };
 
-        //NOTE: LEFT
+        // NOTE: LEFT
         const handleMouseMoveLeftResize = (event: MouseEvent) => {
-            const dx = initialMouseX - event.clientX;
-            const newWidth = initialElemWidth + dx;
-            const newLeft = initialElemLeft - dx;
+            const dx = initialMouseX.current - event.clientX;
+            const newWidth = initialElemWidth.current + dx;
+            const newLeft = initialElemLeft.current - dx;
+
             if (newWidth >= MIN_WIDTH) {
                 resizableEl.style.width = `${newWidth}px`;
                 resizableEl.style.left = `${newLeft}px`;
@@ -129,23 +136,23 @@ export default function useWindowResize({ ref }: UseWindowResizeProps) {
         };
 
         const handleMouseDownLeftResize = (event: MouseEvent) => {
-            initialMouseX = event.clientX;
+            initialMouseX.current = event.clientX;
             const styles = window.getComputedStyle(resizableEl);
-            initialElemWidth = parseInt(styles.width, 10);
-            initialElemLeft = parseInt(styles.left, 10);
+            initialElemWidth.current = parseInt(styles.width, 10);
+            initialElemLeft.current = parseInt(styles.left, 10);
             document.addEventListener('mousemove', handleMouseMoveLeftResize);
             document.addEventListener('mouseup', handleMouseUp);
         };
 
-        //NOTE: LEFT TOP
+        // NOTE: LEFT TOP
         const handleMouseMoveLeftTopResize = (event: MouseEvent) => {
-            const dx = initialMouseX - event.clientX;
-            const newWidth = initialElemWidth + dx;
-            const newLeft = initialElemLeft - dx;
+            const dx = initialMouseX.current - event.clientX;
+            const newWidth = initialElemWidth.current + dx;
+            const newLeft = initialElemLeft.current - dx;
 
-            const dy = initialMouseY - event.clientY;
-            const newHeight = initialElemHeight + dy;
-            const newTop = initialElemTop - dy;
+            const dy = initialMouseY.current - event.clientY;
+            const newHeight = initialElemHeight.current + dy;
+            const newTop = initialElemTop.current - dy;
 
             if (newWidth >= MIN_WIDTH) {
                 resizableEl.style.width = `${newWidth}px`;
@@ -158,13 +165,13 @@ export default function useWindowResize({ ref }: UseWindowResizeProps) {
         };
 
         const handleMouseDownLeftTopResize = (event: MouseEvent) => {
-            initialMouseX = event.clientX;
-            initialMouseY = event.clientY;
+            initialMouseX.current = event.clientX;
+            initialMouseY.current = event.clientY;
             const styles = window.getComputedStyle(resizableEl);
-            initialElemWidth = parseInt(styles.width, 10);
-            initialElemHeight = parseInt(styles.height, 10);
-            initialElemLeft = parseInt(styles.left, 10);
-            initialElemTop = parseInt(styles.top, 10);
+            initialElemWidth.current = parseInt(styles.width, 10);
+            initialElemHeight.current = parseInt(styles.height, 10);
+            initialElemLeft.current = parseInt(styles.left, 10);
+            initialElemTop.current = parseInt(styles.top, 10);
             document.addEventListener(
                 'mousemove',
                 handleMouseMoveLeftTopResize,
@@ -172,14 +179,14 @@ export default function useWindowResize({ ref }: UseWindowResizeProps) {
             document.addEventListener('mouseup', handleMouseUp);
         };
 
-        //NOTE: RIGHT TOP
+        // NOTE: RIGHT TOP
         const handleMouseMoveRightTopResize = (event: MouseEvent) => {
-            const dx = event.clientX - initialMouseX;
-            const newWidth = initialElemWidth + dx;
+            const dx = event.clientX - initialMouseX.current;
+            const newWidth = initialElemWidth.current + dx;
 
-            const dy = initialMouseY - event.clientY;
-            const newHeight = initialElemHeight + dy;
-            const newTop = initialElemTop - dy;
+            const dy = initialMouseY.current - event.clientY;
+            const newHeight = initialElemHeight.current + dy;
+            const newTop = initialElemTop.current - dy;
 
             if (newWidth >= MIN_WIDTH) {
                 resizableEl.style.width = `${newWidth}px`;
@@ -191,13 +198,13 @@ export default function useWindowResize({ ref }: UseWindowResizeProps) {
         };
 
         const handleMouseDownRightTopResize = (event: MouseEvent) => {
-            initialMouseX = event.clientX;
-            initialMouseY = event.clientY;
+            initialMouseX.current = event.clientX;
+            initialMouseY.current = event.clientY;
             const styles = window.getComputedStyle(resizableEl);
-            initialElemWidth = parseInt(styles.width, 10);
-            initialElemHeight = parseInt(styles.height, 10);
-            initialElemLeft = parseInt(styles.left, 10);
-            initialElemTop = parseInt(styles.top, 10);
+            initialElemWidth.current = parseInt(styles.width, 10);
+            initialElemHeight.current = parseInt(styles.height, 10);
+            initialElemLeft.current = parseInt(styles.left, 10);
+            initialElemTop.current = parseInt(styles.top, 10);
             document.addEventListener(
                 'mousemove',
                 handleMouseMoveRightTopResize,
@@ -205,13 +212,13 @@ export default function useWindowResize({ ref }: UseWindowResizeProps) {
             document.addEventListener('mouseup', handleMouseUp);
         };
 
-        //NOTE: RIGHT BOTTOM
+        // NOTE: RIGHT BOTTOM
         const handleMouseMoveRightBottomResize = (event: MouseEvent) => {
-            const dx = event.clientX - initialMouseX;
-            const newWidth = initialElemWidth + dx;
+            const dx = event.clientX - initialMouseX.current;
+            const newWidth = initialElemWidth.current + dx;
 
-            const dy = event.clientY - initialMouseY;
-            const newHeight = initialElemHeight + dy;
+            const dy = event.clientY - initialMouseY.current;
+            const newHeight = initialElemHeight.current + dy;
 
             if (newWidth >= MIN_WIDTH) {
                 resizableEl.style.width = `${newWidth}px`;
@@ -222,11 +229,11 @@ export default function useWindowResize({ ref }: UseWindowResizeProps) {
         };
 
         const handleMouseDownRightBottomResize = (event: MouseEvent) => {
-            initialMouseX = event.clientX;
-            initialMouseY = event.clientY;
+            initialMouseX.current = event.clientX;
+            initialMouseY.current = event.clientY;
             const styles = window.getComputedStyle(resizableEl);
-            initialElemWidth = parseInt(styles.width, 10);
-            initialElemHeight = parseInt(styles.height, 10);
+            initialElemWidth.current = parseInt(styles.width, 10);
+            initialElemHeight.current = parseInt(styles.height, 10);
             document.addEventListener(
                 'mousemove',
                 handleMouseMoveRightBottomResize,
@@ -234,14 +241,14 @@ export default function useWindowResize({ ref }: UseWindowResizeProps) {
             document.addEventListener('mouseup', handleMouseUp);
         };
 
-        //NOTE: LEFT BOTTOM
+        // NOTE: LEFT BOTTOM
         const handleMouseMoveLeftBottomResize = (event: MouseEvent) => {
-            const dx = initialMouseX - event.clientX;
-            const newWidth = initialElemWidth + dx;
-            const newLeft = initialElemLeft - dx;
+            const dx = initialMouseX.current - event.clientX;
+            const newWidth = initialElemWidth.current + dx;
+            const newLeft = initialElemLeft.current - dx;
 
-            const dy = event.clientY - initialMouseY;
-            const newHeight = initialElemHeight + dy;
+            const dy = event.clientY - initialMouseY.current;
+            const newHeight = initialElemHeight.current + dy;
 
             if (newWidth >= MIN_WIDTH) {
                 resizableEl.style.width = `${newWidth}px`;
@@ -253,19 +260,20 @@ export default function useWindowResize({ ref }: UseWindowResizeProps) {
         };
 
         const handleMouseDownLeftBottomResize = (event: MouseEvent) => {
-            initialMouseX = event.clientX;
-            initialMouseY = event.clientY;
+            initialMouseX.current = event.clientX;
+            initialMouseY.current = event.clientY;
             const styles = window.getComputedStyle(resizableEl);
-            initialElemWidth = parseInt(styles.width, 10);
-            initialElemHeight = parseInt(styles.height, 10);
-            initialElemLeft = parseInt(styles.left, 10);
-            initialElemTop = parseInt(styles.top, 10);
+            initialElemWidth.current = parseInt(styles.width, 10);
+            initialElemHeight.current = parseInt(styles.height, 10);
+            initialElemLeft.current = parseInt(styles.left, 10);
+            initialElemTop.current = parseInt(styles.top, 10);
             document.addEventListener(
                 'mousemove',
                 handleMouseMoveLeftBottomResize,
             );
             document.addEventListener('mouseup', handleMouseUp);
         };
+
         const resizerRight = rightRef.current;
         resizerRight?.addEventListener('mousedown', handleMouseDownRightResize);
 
@@ -305,10 +313,46 @@ export default function useWindowResize({ ref }: UseWindowResizeProps) {
             handleMouseDownLeftBottomResize,
         );
 
+        workspaceEl.addEventListener('mouseleave', handleMouseUp);
+
         return () => {
-            handleMouseUp();
+            // Clean up all event listeners when the component unmounts
+            resizerRight?.removeEventListener(
+                'mousedown',
+                handleMouseDownRightResize,
+            );
+            resizerTop?.removeEventListener(
+                'mousedown',
+                handleMouseDownTopResize,
+            );
+            resizerBottom?.removeEventListener(
+                'mousedown',
+                handleMouseDownBottomResize,
+            );
+            resizerLeft?.removeEventListener(
+                'mousedown',
+                handleMouseDownLeftResize,
+            );
+            resizerLeftTop?.removeEventListener(
+                'mousedown',
+                handleMouseDownLeftTopResize,
+            );
+            resizerRightTop?.removeEventListener(
+                'mousedown',
+                handleMouseDownRightTopResize,
+            );
+            resizerRightBottom?.removeEventListener(
+                'mousedown',
+                handleMouseDownRightBottomResize,
+            );
+            resizerLeftBottom?.removeEventListener(
+                'mousedown',
+                handleMouseDownLeftBottomResize,
+            );
+            handleMouseUp(); // This will remove the mousemove and mouseup listeners
+            workspaceEl.removeEventListener('mouseleave', handleMouseUp);
         };
-    }, [ref]);
+    }, [ref, workspace]); // Added workspace to the dependency array as it's used in the effect
 
     return {
         leftRef,
