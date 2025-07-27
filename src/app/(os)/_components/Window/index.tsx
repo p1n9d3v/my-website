@@ -133,10 +133,12 @@ export default function Window({ window: osWindow, children }: WindowProps) {
                     onHide={handleHideWindow}
                 />
 
-                {/* 컨텐츠 영역 */}
+                {/*NOTE: 컨텐츠 영역 */}
                 <div className="h-[calc(100%-2rem)] overflow-auto p-4">
                     {children}
                 </div>
+
+                {/*NOTE: Resizer */}
                 <div
                     ref={leftRef}
                     className="absolute top-0 left-0 h-full w-1 cursor-w-resize"
