@@ -9,9 +9,9 @@ interface ProgramProps extends ComponentProps<'button'> {
 }
 
 export default function Program({ icon, name, id, ...rest }: ProgramProps) {
-    const registerWindow = useOSStore((state) => state.registerWindow);
+    const registerWindow = useOSStore((state) => state.launchProgram);
 
-    const handleRegisterProcess = () => {
+    const handleLaunchProcess = () => {
         registerWindow({
             id,
             name,
@@ -19,7 +19,7 @@ export default function Program({ icon, name, id, ...rest }: ProgramProps) {
     };
 
     return (
-        <button {...rest} onClick={handleRegisterProcess}>
+        <button {...rest} onDoubleClick={handleLaunchProcess}>
             {icon}
             <p className="text-sm">{name}</p>
         </button>

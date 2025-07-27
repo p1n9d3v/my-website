@@ -1,9 +1,9 @@
 import { create } from 'zustand';
 
-import { useWindowSlice, type WindowSlice } from './slices/window';
+import { useProcessSlice, type ProcessSlice } from './slices/window';
 
-type CombinedState = WindowSlice;
+type CombinedState = ProcessSlice;
 
 export const useOSStore = create<CombinedState>((...a) => ({
-    ...useWindowSlice(...a),
+    ...useProcessSlice(...a),
 }));

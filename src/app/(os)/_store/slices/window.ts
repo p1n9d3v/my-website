@@ -1,69 +1,69 @@
-import { nanoid } from 'nanoid';
 import { immer } from 'zustand/middleware/immer';
 
-import type { Window } from '../../_types';
+import type { Process } from '../../_types';
 
 import { MIN_HEIGHT, MIN_WIDTH } from '../../_constants';
 
-export interface WindowStoreStates {
-    windows: Record<string, Window>;
-    activeWindowId: string;
-    zIndexCounter: number;
+export interface ProcessStoreStates {
+    processes: Record<string, Process>;
+    focusedProcess: string;
+    focusCounter: number;
 }
 
-export interface WindowStoreActions {
-    registerWindow: (process: { name: string; id: string }) => void;
-    activateWindow: (windowId: string) => void;
-    closeWindow: (windowId: string) => void;
-    hideWindow: (windowId: string) => void;
+export interface ProcessStoreActions {
+    launchProgram: (process: { name: string; id: string }) => void;
+    focusProcess: (windowId: string) => void;
+    closeProcess: (windowId: string) => void;
+    hideProcess: (windowId: string) => void;
 }
 
-export type WindowSlice = WindowStoreStates & WindowStoreActions;
+export type ProcessSlice = ProcessStoreStates & ProcessStoreActions;
 
-export const useWindowSlice = immer<WindowSlice>((set) => ({
-    windows: {},
-    activeWindowId: '',
-    zIndexCounter: 0,
-    registerWindow: (process) => {
-        const windowId = nanoid();
-        const position = {
+export const useProcessSlice = immer<ProcessSlice>((set) => ({
+    processes: {},
+    focusedProcess: '',
+    focusCounter: 0,
+    launchProgram: (process) => {
+        const windowPosition = {
             x: window.innerWidth / 2 - MIN_WIDTH / 2,
             y: window.innerHeight / 2 - MIN_HEIGHT / 2,
         };
-        const size = {
+        const windowSize = {
             width: MIN_WIDTH,
             height: MIN_HEIGHT,
         };
 
         set((state) => {
-            state.windows[windowId] = {
-                id: windowId,
-                position,
-                size,
-                process,
-                zIndex: state.zIndexCounter,
-                isHide: false,
+            state.processes[process.id] = {
+                id: process.id,
+                name: process.name,
+                window: {
+                    position: windowPosition,
+                    size: windowSize,
+                    isHide: false,
+                    zIndex: state.focusCounter,
+                },
             };
-            state.zIndexCounter++;
+            state.focusCounter++;
         });
     },
-    hideWindow: (windowId) => {
+    hideProcess: (windowId) => {
         set((state) => {
-            state.windows[windowId].isHide = true;
+            state.processes[windowId].window.isHide = true;
         });
     },
-    activateWindow: (windowId) => {
+    focusProcess: (windowId) => {
         set((state) => {
-            state.activeWindowId = windowId;
-            if (state.windows[windowId]) {
-                state.windows[windowId].zIndex = state.zIndexCounter;
-                state.zIndexCounter++;
+            state.focusedProcess = windowId;
+            if (state.processes[windowId]) {
+                state.processes[windowId].window.zIndex = state.focusCounter;
+                state.focusCounter++;
             }
         });
     },
-    closeWindow: (windowId) => {
+    closeProcess: (windowId) => {
         set((state) => {
-            delete state.windows[windowId];
+            delete state.processes[windowId];
         });
     },
 }));

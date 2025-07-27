@@ -18,9 +18,7 @@ export interface Size {
 }
 
 export interface Window {
-    id: string;
     position: Position;
-    process: Process;
     zIndex: number;
     size: Size;
     isHide: boolean;
@@ -29,4 +27,5 @@ export interface Window {
 export interface Process {
     id: string;
     name: string;
+    window: Window;
 }

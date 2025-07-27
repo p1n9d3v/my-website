@@ -14,12 +14,19 @@ import { useOSStore } from '../../_store';
 import WindowHeader from './WindowHeader';
 
 interface WindowProps {
+    processId: string;
+    title: string;
     window: Window;
     children: ReactNode;
 }
 
-export default function Window({ window: osWindow, children }: WindowProps) {
-    const { id, process, position, size, isHide, zIndex } = osWindow;
+export default function Window({
+    processId,
+    title,
+    window: _window,
+    children,
+}: WindowProps) {
+    const { position, size, isHide, zIndex } = _window;
 
     const [isMaximized, setIsMaximized] = useState(false);
 
@@ -27,7 +34,7 @@ export default function Window({ window: osWindow, children }: WindowProps) {
     const prevTransform = useRef<string>('');
     const prevSize = useRef<Size>(size);
 
-    const { closeWindow, activateWindow, hideWindow } = useOSStore();
+    const { closeProcess, focusProcess, hideProcess } = useOSStore();
 
     const {
         leftRef,
@@ -43,9 +50,9 @@ export default function Window({ window: osWindow, children }: WindowProps) {
         workspace: '.workspace',
     });
 
-    const handleCloseWindow = () => closeWindow(id);
-    const handleClickWindow = () => activateWindow(id);
-    const handleHideWindow = () => hideWindow(id);
+    const handleCloseWindow = () => closeProcess(processId);
+    const handleClickWindow = () => focusProcess(processId);
+    const handleHideWindow = () => hideProcess(processId);
 
     const handleMaximizeWindow = () => {
         const workspaceEl = document.querySelector('.workspace');
@@ -72,9 +79,10 @@ export default function Window({ window: osWindow, children }: WindowProps) {
         const translateY = transformMatrix.m42;
 
         const nodeBounds = nodeEl.getBoundingClientRect();
+        const headerOffset = 40;
 
         const newTranslateX = translateX - nodeBounds.x;
-        const newTranslateY = translateY - nodeBounds.y + 40;
+        const newTranslateY = translateY - nodeBounds.y + headerOffset;
 
         nodeEl.style.transform = `translate(${newTranslateX}px, ${newTranslateY}px)`;
 
@@ -124,7 +132,7 @@ export default function Window({ window: osWindow, children }: WindowProps) {
                 onClick={handleClickWindow}
             >
                 <WindowHeader
-                    title={process.name}
+                    title={title}
                     className="window-title-bar"
                     isMaximized={isMaximized}
                     onClose={handleCloseWindow}

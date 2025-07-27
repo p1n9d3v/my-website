@@ -16,7 +16,7 @@ const PROGRAMS = [
 ];
 
 export default function Page() {
-    const windows = useOSStore((state) => state.windows);
+    const processes = useOSStore((state) => state.processes);
 
     return (
         <>
@@ -28,8 +28,13 @@ export default function Page() {
                     icon={program.icon}
                 />
             ))}
-            {Object.values(windows).map((window) => (
-                <Window key={window.id} window={window}>
+            {Object.values(processes).map((process) => (
+                <Window
+                    key={process.id}
+                    processId={process.id}
+                    title={process.name}
+                    window={process.window}
+                >
                     <p className="text-xl dark:text-green-500">Funcking</p>
                 </Window>
             ))}
