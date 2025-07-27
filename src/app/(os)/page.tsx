@@ -32,8 +32,14 @@ export default function Page() {
                 <Window
                     key={process.id}
                     processId={process.id}
-                    title={process.name}
                     window={process.window}
+                    renderHeaderContent={
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 transform">
+                            <p className="text-xl dark:text-green-500">
+                                {process.name}
+                            </p>
+                        </div>
+                    }
                 >
                     <p className="text-xl dark:text-green-500">Funcking</p>
                 </Window>

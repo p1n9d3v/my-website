@@ -1,7 +1,7 @@
 import { useRef, type ComponentProps, type ReactNode } from 'react';
 import Draggable from 'react-draggable';
 
-import { useOSStore } from '../../_store';
+import { useOSStore } from '../_store';
 
 interface ProgramProps extends ComponentProps<'button'> {
     icon: ReactNode;

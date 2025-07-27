@@ -15,16 +15,16 @@ import WindowHeader from './WindowHeader';
 
 interface WindowProps {
     processId: string;
-    title: string;
     window: Window;
     children: ReactNode;
+    renderHeaderContent?: ReactNode;
 }
 
 export default function Window({
     processId,
-    title,
     window: _window,
     children,
+    renderHeaderContent,
 }: WindowProps) {
     const { position, size, isHide, zIndex } = _window;
 
@@ -34,7 +34,7 @@ export default function Window({
     const prevTransform = useRef<string>('');
     const prevSize = useRef<Size>(size);
 
-    const { closeProcess, focusProcess, hideProcess } = useOSStore();
+    const { terminateProcess, focusProcess, hideProcess } = useOSStore();
 
     const {
         leftRef,
@@ -50,7 +50,7 @@ export default function Window({
         workspace: '.workspace',
     });
 
-    const handleCloseWindow = () => closeProcess(processId);
+    const handleCloseWindow = () => terminateProcess(processId);
     const handleClickWindow = () => focusProcess(processId);
     const handleHideWindow = () => hideProcess(processId);
 
@@ -73,7 +73,7 @@ export default function Window({
         const nodeTransform = window.getComputedStyle(nodeEl).transform;
         prevTransform.current = nodeTransform;
 
-        //NOTE: Draggable 컴포넌트가 transform 속성을 사용하기 때문에 변경된 resize를 통해 변경된 left,top에 대한 보정 처리
+        //DESC: Draggable 컴포넌트가 transform 속성을 사용하기 때문에 변경된 resize를 통해 변경된 left,top에 대한 보정 처리
         const transformMatrix = new DOMMatrix(nodeTransform);
         const translateX = transformMatrix.m41;
         const translateY = transformMatrix.m42;
@@ -132,21 +132,21 @@ export default function Window({
                 onClick={handleClickWindow}
             >
                 <WindowHeader
-                    title={title}
                     className="window-title-bar"
                     isMaximized={isMaximized}
+                    renderContent={renderHeaderContent}
                     onClose={handleCloseWindow}
                     onMaximize={handleMaximizeWindow}
                     onRestore={handleRestoreWindow}
                     onHide={handleHideWindow}
                 />
 
-                {/*NOTE: 컨텐츠 영역 */}
+                {/*DESC: 컨텐츠 영역 */}
                 <div className="h-[calc(100%-2rem)] overflow-auto p-4">
                     {children}
                 </div>
 
-                {/*NOTE: Resizer */}
+                {/*DESC: Resizer */}
                 <div
                     ref={leftRef}
                     className="absolute top-0 left-0 h-full w-1 cursor-ew-resize"

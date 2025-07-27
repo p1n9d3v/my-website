@@ -1,21 +1,23 @@
+import type { ReactNode } from 'react';
+
+import { Minus, X, Minimize2, Maximize2 } from 'lucide-react';
+
 import { cn } from '@/utils/cn';
 
-import WindowControls from './WindowControls';
-
 interface WindowHeaderProps {
-    title: string;
     className: string;
     isMaximized: boolean;
     onClose?: () => void;
     onMaximize?: () => void;
     onRestore?: () => void;
     onHide?: () => void;
+    renderContent?: ReactNode;
 }
 
 export default function WindowHeader({
-    title,
     className,
     isMaximized,
+    renderContent,
     onClose,
     onRestore,
     onMaximize,
@@ -31,21 +33,72 @@ export default function WindowHeader({
                 className,
             )}
         >
-            {/* 왼쪽: 컨트롤 버튼 */}
+            {/*DESC: 왼쪽: 컨트롤 버튼 */}
             <div className="cursor-default">
-                <WindowControls
-                    isMaximized={isMaximized}
-                    onClose={onClose}
-                    onMaximize={onMaximize}
-                    onRestore={onRestore}
-                    onHide={onHide}
-                />
+                <div className="group flex items-center gap-2">
+                    {/*DESC: 닫기 버튼 */}
+                    <button
+                        onClick={onClose}
+                        className={cn(
+                            'h-3 w-3 rounded-full bg-red-500',
+                            'transition-colors hover:bg-red-600',
+                            'flex items-center justify-center',
+                        )}
+                        title="닫기"
+                    >
+                        <X
+                            size={10}
+                            className="text-black opacity-0 transition-opacity group-hover:opacity-100"
+                            strokeWidth={3}
+                        />
+                    </button>
+
+                    {/*DESC: 숨김 버튼 */}
+                    <button
+                        onClick={onHide}
+                        className={cn(
+                            'h-3 w-3 rounded-full bg-yellow-500',
+                            'transition-colors hover:bg-yellow-600',
+                            'flex items-center justify-center',
+                        )}
+                        title="최소화"
+                    >
+                        <Minus
+                            size={10}
+                            className="text-black opacity-0 transition-opacity group-hover:opacity-100"
+                            strokeWidth={3}
+                        />
+                    </button>
+
+                    {/*DESC: 최대화/최소화 버튼 */}
+                    <button
+                        onClick={isMaximized ? onRestore : onMaximize}
+                        className={cn(
+                            'h-3 w-3 rounded-full bg-green-500',
+                            'transition-colors hover:bg-green-600',
+                            'flex items-center justify-center',
+                        )}
+                        title={isMaximized ? '최소화' : '최대화'}
+                    >
+                        {isMaximized ? (
+                            <Minimize2
+                                size={10}
+                                className="text-black opacity-0 transition-opacity group-hover:opacity-100"
+                                strokeWidth={3}
+                            />
+                        ) : (
+                            <Maximize2
+                                size={10}
+                                className="text-black opacity-0 transition-opacity group-hover:opacity-100"
+                                strokeWidth={3}
+                            />
+                        )}
+                    </button>
+                </div>
             </div>
 
-            {/* 중앙: 제목 */}
-            <div className="absolute left-1/2 -translate-x-1/2 transform">
-                <span className="text-sm font-medium text-white">{title}</span>
-            </div>
+            {/*DESC: 중앙: 컨텐츠 */}
+            <div className="flex-1">{renderContent}</div>
         </div>
     );
 }

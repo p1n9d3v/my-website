@@ -7,13 +7,13 @@ import { MIN_HEIGHT, MIN_WIDTH } from '../../_constants';
 export interface ProcessStoreStates {
     processes: Record<string, Process>;
     focusedProcess: string;
-    focusCounter: number;
+    zIndexCounter: number;
 }
 
 export interface ProcessStoreActions {
     launchProgram: (process: { name: string; id: string }) => void;
     focusProcess: (windowId: string) => void;
-    closeProcess: (windowId: string) => void;
+    terminateProcess: (windowId: string) => void;
     hideProcess: (windowId: string) => void;
 }
 
@@ -22,7 +22,7 @@ export type ProcessSlice = ProcessStoreStates & ProcessStoreActions;
 export const useProcessSlice = immer<ProcessSlice>((set) => ({
     processes: {},
     focusedProcess: '',
-    focusCounter: 0,
+    zIndexCounter: 0,
     launchProgram: (process) => {
         const windowPosition = {
             x: window.innerWidth / 2 - MIN_WIDTH / 2,
@@ -41,10 +41,10 @@ export const useProcessSlice = immer<ProcessSlice>((set) => ({
                     position: windowPosition,
                     size: windowSize,
                     isHide: false,
-                    zIndex: state.focusCounter,
+                    zIndex: state.zIndexCounter,
                 },
             };
-            state.focusCounter++;
+            state.zIndexCounter++;
         });
     },
     hideProcess: (windowId) => {
@@ -56,12 +56,12 @@ export const useProcessSlice = immer<ProcessSlice>((set) => ({
         set((state) => {
             state.focusedProcess = windowId;
             if (state.processes[windowId]) {
-                state.processes[windowId].window.zIndex = state.focusCounter;
-                state.focusCounter++;
+                state.processes[windowId].window.zIndex = state.zIndexCounter;
+                state.zIndexCounter++;
             }
         });
     },
-    closeProcess: (windowId) => {
+    terminateProcess: (windowId) => {
         set((state) => {
             delete state.processes[windowId];
         });
