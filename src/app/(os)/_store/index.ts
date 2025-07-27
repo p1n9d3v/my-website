@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-import { useProcessSlice, type ProcessSlice } from './slices/window';
+import { useProcessSlice, type ProcessSlice } from './slices/process';
 
 type CombinedState = ProcessSlice;
 
