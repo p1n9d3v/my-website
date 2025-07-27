@@ -109,7 +109,7 @@ export default function Window({
             disabled={isMaximized}
             defaultPosition={position}
             defaultClassName={cn('left-0 top-0', isHide && 'invisible')}
-            onDrag={() => {
+            onStart={() => {
                 document.body.style.cursor = 'grabbing';
             }}
             onStop={() => {
@@ -149,15 +149,15 @@ export default function Window({
                 {/*NOTE: Resizer */}
                 <div
                     ref={leftRef}
-                    className="absolute top-0 left-0 h-full w-1 cursor-w-resize"
+                    className="absolute top-0 left-0 h-full w-1 cursor-ew-resize"
                 />
                 <div
                     ref={rightRef}
-                    className="absolute top-0 right-0 h-full w-1 cursor-e-resize"
+                    className="absolute top-0 right-0 h-full w-1 cursor-ew-resize"
                 />
                 <div
                     ref={topRef}
-                    className="absolute top-0 left-0 h-1 w-full cursor-n-resize"
+                    className="absolute top-0 left-0 h-1 w-full cursor-ns-resize"
                 />
                 <div
                     ref={bottomRef}
@@ -165,19 +165,19 @@ export default function Window({
                 />
                 <div
                     ref={leftTopRef}
-                    className="absolute top-0 left-0 h-2 w-2 cursor-nw-resize rounded-full"
+                    className="absolute top-0 left-0 h-2 w-2 cursor-nwse-resize rounded-full"
                 />
                 <div
                     ref={rightTopRef}
-                    className="absolute top-0 right-0 h-2 w-2 cursor-ne-resize rounded-full"
+                    className="absolute top-0 right-0 h-2 w-2 cursor-nesw-resize rounded-full"
                 />
                 <div
                     ref={leftBottomRef}
-                    className="absolute bottom-0 left-0 h-2 w-2 cursor-sw-resize rounded-full"
+                    className="absolute bottom-0 left-0 h-2 w-2 cursor-nesw-resize rounded-full"
                 />
                 <div
                     ref={rightBottomRef}
-                    className="absolute right-0 bottom-0 h-2 w-2 cursor-se-resize rounded-full"
+                    className="absolute right-0 bottom-0 h-2 w-2 cursor-nwse-resize rounded-full"
                 />
             </div>
         </Draggable>

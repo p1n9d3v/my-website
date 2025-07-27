@@ -63,6 +63,7 @@ export default function useWindowResize({
                 handleMouseMoveLeftBottomResize,
             );
 
+            document.body.style.cursor = 'default';
             document.removeEventListener('mouseup', handleMouseUp);
         };
 
@@ -80,6 +81,8 @@ export default function useWindowResize({
             initialMouseX.current = event.clientX;
             const styles = window.getComputedStyle(resizableEl);
             initialElemWidth.current = parseInt(styles.width, 10);
+
+            document.body.style.cursor = 'ew-resize';
             document.addEventListener('mousemove', handleMouseMoveRightResize);
             document.addEventListener('mouseup', handleMouseUp);
         };
@@ -101,6 +104,8 @@ export default function useWindowResize({
             const styles = window.getComputedStyle(resizableEl);
             initialElemHeight.current = parseInt(styles.height, 10);
             initialElemTop.current = parseInt(styles.top, 10);
+
+            document.body.style.cursor = 'ns-resize';
             document.addEventListener('mousemove', handleMouseMoveTopResize);
             document.addEventListener('mouseup', handleMouseUp);
         };
@@ -119,6 +124,8 @@ export default function useWindowResize({
             initialMouseY.current = event.clientY;
             const styles = window.getComputedStyle(resizableEl);
             initialElemHeight.current = parseInt(styles.height, 10);
+
+            document.body.style.cursor = 'ns-resize';
             document.addEventListener('mousemove', handleMouseMoveBottomResize);
             document.addEventListener('mouseup', handleMouseUp);
         };
@@ -140,6 +147,8 @@ export default function useWindowResize({
             const styles = window.getComputedStyle(resizableEl);
             initialElemWidth.current = parseInt(styles.width, 10);
             initialElemLeft.current = parseInt(styles.left, 10);
+
+            document.body.style.cursor = 'ew-resize';
             document.addEventListener('mousemove', handleMouseMoveLeftResize);
             document.addEventListener('mouseup', handleMouseUp);
         };
@@ -172,6 +181,8 @@ export default function useWindowResize({
             initialElemHeight.current = parseInt(styles.height, 10);
             initialElemLeft.current = parseInt(styles.left, 10);
             initialElemTop.current = parseInt(styles.top, 10);
+
+            document.body.style.cursor = 'nwse-resize';
             document.addEventListener(
                 'mousemove',
                 handleMouseMoveLeftTopResize,
@@ -205,6 +216,8 @@ export default function useWindowResize({
             initialElemHeight.current = parseInt(styles.height, 10);
             initialElemLeft.current = parseInt(styles.left, 10);
             initialElemTop.current = parseInt(styles.top, 10);
+
+            document.body.style.cursor = 'nesw-resize';
             document.addEventListener(
                 'mousemove',
                 handleMouseMoveRightTopResize,
@@ -234,6 +247,8 @@ export default function useWindowResize({
             const styles = window.getComputedStyle(resizableEl);
             initialElemWidth.current = parseInt(styles.width, 10);
             initialElemHeight.current = parseInt(styles.height, 10);
+
+            document.body.style.cursor = 'nwse-resize';
             document.addEventListener(
                 'mousemove',
                 handleMouseMoveRightBottomResize,
@@ -267,6 +282,8 @@ export default function useWindowResize({
             initialElemHeight.current = parseInt(styles.height, 10);
             initialElemLeft.current = parseInt(styles.left, 10);
             initialElemTop.current = parseInt(styles.top, 10);
+
+            document.body.style.cursor = 'nesw-resize';
             document.addEventListener(
                 'mousemove',
                 handleMouseMoveLeftBottomResize,
