@@ -3,9 +3,9 @@
 import { Folder } from 'lucide-react';
 import { nanoid } from 'nanoid';
 
-import Window from '@/os/_components/os/Window';
+import Window from '@/os/_components/Window';
 
-import Program from './_components/os/Program';
+import Program from './_components/Program';
 import { useOSStore } from './_store';
 
 const PROGRAMS = [

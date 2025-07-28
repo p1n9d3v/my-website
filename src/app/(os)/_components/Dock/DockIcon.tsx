@@ -1,8 +1,8 @@
 import { useState } from 'react';
 
-import { cn } from '@/utils/cn';
+import type { DockApp } from '@/os/_types';
 
-import type { DockApp } from '../../../_types';
+import { cn } from '@/utils/cn';
 
 interface DockIconProps {
     app: DockApp;

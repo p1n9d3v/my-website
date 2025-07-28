@@ -5,11 +5,11 @@ import type { ReactNode } from 'react';
 import { useRef, useState } from 'react';
 import Draggable from 'react-draggable';
 
+import type { Size, Window } from '@/os/_types';
+
+import useWindowResize from '@/os/_hooks/useWindowResize';
 import { cn } from '@/utils/cn';
 
-import type { Size, Window } from '../../../_types';
-
-import useWindowResize from '../../../_hooks/useWindowResize';
 import WindowHeader from './WindowHeader';
 
 interface WindowProps {
