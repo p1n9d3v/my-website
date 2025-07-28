@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react';
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import Draggable from 'react-draggable';
 
 import type { Position, Size, Window } from '@/os/_types';
@@ -52,8 +52,8 @@ export default function Window({
         rightBottomRef,
     } = useWindowResize({
         ref: nodeRef,
-        setSize: setSyncSize,
-        setPosition: setSyncPosition,
+        onUpdateSize: (size) => setSyncSize(size),
+        onUpdatePosition: (position) => setSyncPosition(position),
         workspace: '.workspace',
     });
 
@@ -146,9 +146,7 @@ export default function Window({
                 />
 
                 {/*DESC: 컨텐츠 영역 */}
-                <div className="h-[calc(100%-2rem)] overflow-auto p-4">
-                    {children}
-                </div>
+                <div className="h-[calc(100%-2rem)]">{children}</div>
 
                 {/*DESC: Resizer */}
                 <div

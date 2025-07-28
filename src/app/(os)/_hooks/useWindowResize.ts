@@ -1,5 +1,3 @@
-import type { Dispatch, SetStateAction } from 'react';
-
 import { useEffect, useRef, type RefObject } from 'react';
 
 import type { Position, Size } from '../_types';
@@ -9,15 +7,15 @@ import { MIN_HEIGHT, MIN_WIDTH } from '../_constants';
 interface UseWindowResizeProps {
     ref: RefObject<HTMLDivElement | null>;
     workspace: string;
-    setSize: Dispatch<SetStateAction<Size>>;
-    setPosition: Dispatch<SetStateAction<Position>>;
+    onUpdateSize: (size: Size) => void;
+    onUpdatePosition: (position: Position) => void;
 }
 
 export default function useWindowResize({
     ref,
     workspace,
-    setSize,
-    setPosition,
+    onUpdateSize,
+    onUpdatePosition,
 }: UseWindowResizeProps) {
     const leftRef = useRef<HTMLDivElement>(null);
     const rightRef = useRef<HTMLDivElement>(null);
@@ -97,11 +95,11 @@ export default function useWindowResize({
 
             const { translateX, translateY } = getTranslate(resizableEl);
             const { width, height } = getSize(resizableEl);
-            setPosition({
+            onUpdatePosition({
                 x: translateX,
                 y: translateY,
             });
-            setSize({
+            onUpdateSize({
                 width,
                 height,
             });
@@ -136,9 +134,10 @@ export default function useWindowResize({
             const newHeight = initialElemHeight.current + dy;
             const newTop = initialElemTop.current - dy;
 
-            const { translateX } = getTranslate(resizableEl);
             if (newHeight >= MIN_HEIGHT) {
                 resizableEl.style.height = `${newHeight}px`;
+
+                const { translateX } = getTranslate(resizableEl);
                 resizableEl.style.transform = `translate(${translateX}px, ${newTop}px)`;
             }
         };
@@ -184,9 +183,10 @@ export default function useWindowResize({
             const newWidth = initialElemWidth.current + dx;
             const newLeft = initialElemLeft.current - dx;
 
-            const { translateY } = getTranslate(resizableEl);
             if (newWidth >= MIN_WIDTH) {
                 resizableEl.style.width = `${newWidth}px`;
+
+                const { translateY } = getTranslate(resizableEl);
                 resizableEl.style.transform = `translate(${newLeft}px, ${translateY}px)`;
             }
         };
@@ -217,12 +217,15 @@ export default function useWindowResize({
 
             if (newWidth >= MIN_WIDTH) {
                 resizableEl.style.width = `${newWidth}px`;
-                resizableEl.style.transform = `translate(${newLeft}px, ${newTop}px)`;
+
+                const { translateY } = getTranslate(resizableEl);
+                resizableEl.style.transform = `translate(${newLeft}px, ${translateY}px)`;
             }
             if (newHeight >= MIN_HEIGHT) {
                 resizableEl.style.height = `${newHeight}px`;
 
-                resizableEl.style.transform = `translate(${newLeft}px, ${newTop}px)`;
+                const { translateX } = getTranslate(resizableEl);
+                resizableEl.style.transform = `translate(${translateX}px, ${newTop}px)`;
             }
         };
 
@@ -255,12 +258,13 @@ export default function useWindowResize({
             const newHeight = initialElemHeight.current + dy;
             const newTop = initialElemTop.current - dy;
 
-            const { translateX } = getTranslate(resizableEl);
             if (newWidth >= MIN_WIDTH) {
                 resizableEl.style.width = `${newWidth}px`;
             }
             if (newHeight >= MIN_HEIGHT) {
                 resizableEl.style.height = `${newHeight}px`;
+
+                const { translateX } = getTranslate(resizableEl);
                 resizableEl.style.transform = `translate(${translateX}px, ${newTop}px)`;
             }
         };
@@ -326,9 +330,10 @@ export default function useWindowResize({
             const dy = event.clientY - initialMouseY.current;
             const newHeight = initialElemHeight.current + dy;
 
-            const { translateY } = getTranslate(resizableEl);
             if (newWidth >= MIN_WIDTH) {
                 resizableEl.style.width = `${newWidth}px`;
+
+                const { translateY } = getTranslate(resizableEl);
                 resizableEl.style.transform = `translate(${newLeft}px, ${translateY}px)`;
             }
             if (newHeight >= MIN_HEIGHT) {
@@ -400,7 +405,7 @@ export default function useWindowResize({
         return () => {
             handleCleanUp();
         };
-    }, [ref, setPosition, setSize, workspace]);
+    }, [ref, onUpdatePosition, onUpdateSize, workspace]);
 
     return {
         leftRef,
