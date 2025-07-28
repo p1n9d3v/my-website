@@ -1,3 +1,5 @@
+import type { Dispatch, SetStateAction } from 'react';
+
 import { useEffect, useRef, type RefObject } from 'react';
 
 import type { Position, Size } from '../_types';
@@ -7,13 +9,15 @@ import { MIN_HEIGHT, MIN_WIDTH } from '../_constants';
 interface UseWindowResizeProps {
     ref: RefObject<HTMLDivElement | null>;
     workspace: string;
-    onUpdateRect?: (rect: { position?: Position; size?: Size }) => void;
+    setSize: Dispatch<SetStateAction<Size>>;
+    setPosition: Dispatch<SetStateAction<Position>>;
 }
 
 export default function useWindowResize({
     ref,
     workspace,
-    onUpdateRect,
+    setSize,
+    setPosition,
 }: UseWindowResizeProps) {
     const leftRef = useRef<HTMLDivElement>(null);
     const rightRef = useRef<HTMLDivElement>(null);
@@ -31,12 +35,23 @@ export default function useWindowResize({
     const initialElemLeft = useRef(0);
     const initialElemTop = useRef(0);
 
-    const currentRect = useRef<{
-        x: number;
-        y: number;
-        width: number;
-        height: number;
-    }>({ x: 0, y: 0, width: 0, height: 0 });
+    const getSize = (el: HTMLElement) => {
+        const styles = window.getComputedStyle(el);
+        return {
+            width: parseInt(styles.width, 10),
+            height: parseInt(styles.height, 10),
+        };
+    };
+
+    const getTranslate = (el: HTMLElement) => {
+        const transformMatrix = new DOMMatrix(
+            window.getComputedStyle(el).transform,
+        );
+        const translateX = transformMatrix.m41;
+        const translateY = transformMatrix.m42;
+
+        return { translateX, translateY };
+    };
 
     useEffect(() => {
         const resizableEl = ref.current;
@@ -77,7 +92,20 @@ export default function useWindowResize({
 
         const handleMouseUp = () => {
             document.body.style.cursor = 'default';
+
             handleCleanUp();
+
+            const { translateX, translateY } = getTranslate(resizableEl);
+            const { width, height } = getSize(resizableEl);
+            setPosition({
+                x: translateX,
+                y: translateY,
+            });
+            setSize({
+                width,
+                height,
+            });
+
             document.removeEventListener('mouseup', handleMouseUp);
         };
 
@@ -93,8 +121,9 @@ export default function useWindowResize({
 
         const handleMouseDownRightResize = (event: MouseEvent) => {
             initialMouseX.current = event.clientX;
-            const styles = window.getComputedStyle(resizableEl);
-            initialElemWidth.current = parseInt(styles.width, 10);
+
+            const { width } = getSize(resizableEl);
+            initialElemWidth.current = width;
 
             document.body.style.cursor = 'ew-resize';
             document.addEventListener('mousemove', handleMouseMoveRightResize);
@@ -107,17 +136,21 @@ export default function useWindowResize({
             const newHeight = initialElemHeight.current + dy;
             const newTop = initialElemTop.current - dy;
 
+            const { translateX } = getTranslate(resizableEl);
             if (newHeight >= MIN_HEIGHT) {
                 resizableEl.style.height = `${newHeight}px`;
-                resizableEl.style.top = `${newTop}px`;
+                resizableEl.style.transform = `translate(${translateX}px, ${newTop}px)`;
             }
         };
 
         const handleMouseDownTopResize = (event: MouseEvent) => {
             initialMouseY.current = event.clientY;
-            const styles = window.getComputedStyle(resizableEl);
-            initialElemHeight.current = parseInt(styles.height, 10);
-            initialElemTop.current = parseInt(styles.top, 10);
+
+            const { height } = getSize(resizableEl);
+            initialElemHeight.current = height;
+
+            const { translateY } = getTranslate(resizableEl);
+            initialElemTop.current = translateY;
 
             document.body.style.cursor = 'ns-resize';
             document.addEventListener('mousemove', handleMouseMoveTopResize);
@@ -136,8 +169,9 @@ export default function useWindowResize({
 
         const handleMouseDownBottomResize = (event: MouseEvent) => {
             initialMouseY.current = event.clientY;
-            const styles = window.getComputedStyle(resizableEl);
-            initialElemHeight.current = parseInt(styles.height, 10);
+
+            const { height } = getSize(resizableEl);
+            initialElemHeight.current = height;
 
             document.body.style.cursor = 'ns-resize';
             document.addEventListener('mousemove', handleMouseMoveBottomResize);
@@ -150,17 +184,21 @@ export default function useWindowResize({
             const newWidth = initialElemWidth.current + dx;
             const newLeft = initialElemLeft.current - dx;
 
+            const { translateY } = getTranslate(resizableEl);
             if (newWidth >= MIN_WIDTH) {
                 resizableEl.style.width = `${newWidth}px`;
-                resizableEl.style.left = `${newLeft}px`;
+                resizableEl.style.transform = `translate(${newLeft}px, ${translateY}px)`;
             }
         };
 
         const handleMouseDownLeftResize = (event: MouseEvent) => {
             initialMouseX.current = event.clientX;
-            const styles = window.getComputedStyle(resizableEl);
-            initialElemWidth.current = parseInt(styles.width, 10);
-            initialElemLeft.current = parseInt(styles.left, 10);
+
+            const { width } = getSize(resizableEl);
+            initialElemWidth.current = width;
+
+            const { translateX } = getTranslate(resizableEl);
+            initialElemLeft.current = translateX;
 
             document.body.style.cursor = 'ew-resize';
             document.addEventListener('mousemove', handleMouseMoveLeftResize);
@@ -179,34 +217,26 @@ export default function useWindowResize({
 
             if (newWidth >= MIN_WIDTH) {
                 resizableEl.style.width = `${newWidth}px`;
-                resizableEl.style.left = `${newLeft}px`;
-
-                currentRect.current = {
-                    ...currentRect.current,
-                    x: newLeft,
-                    width: newWidth,
-                };
+                resizableEl.style.transform = `translate(${newLeft}px, ${newTop}px)`;
             }
             if (newHeight >= MIN_HEIGHT) {
                 resizableEl.style.height = `${newHeight}px`;
-                resizableEl.style.top = `${newTop}px`;
 
-                currentRect.current = {
-                    ...currentRect.current,
-                    y: newTop,
-                    height: newHeight,
-                };
+                resizableEl.style.transform = `translate(${newLeft}px, ${newTop}px)`;
             }
         };
 
         const handleMouseDownLeftTopResize = (event: MouseEvent) => {
             initialMouseX.current = event.clientX;
             initialMouseY.current = event.clientY;
-            const styles = window.getComputedStyle(resizableEl);
-            initialElemWidth.current = parseInt(styles.width, 10);
-            initialElemHeight.current = parseInt(styles.height, 10);
-            initialElemLeft.current = parseInt(styles.left, 10);
-            initialElemTop.current = parseInt(styles.top, 10);
+
+            const { width, height } = getSize(resizableEl);
+            initialElemWidth.current = width;
+            initialElemHeight.current = height;
+
+            const { translateX, translateY } = getTranslate(resizableEl);
+            initialElemLeft.current = translateX;
+            initialElemTop.current = translateY;
 
             document.body.style.cursor = 'nwse-resize';
             document.addEventListener(
@@ -225,23 +255,27 @@ export default function useWindowResize({
             const newHeight = initialElemHeight.current + dy;
             const newTop = initialElemTop.current - dy;
 
+            const { translateX } = getTranslate(resizableEl);
             if (newWidth >= MIN_WIDTH) {
                 resizableEl.style.width = `${newWidth}px`;
             }
             if (newHeight >= MIN_HEIGHT) {
                 resizableEl.style.height = `${newHeight}px`;
-                resizableEl.style.top = `${newTop}px`;
+                resizableEl.style.transform = `translate(${translateX}px, ${newTop}px)`;
             }
         };
 
         const handleMouseDownRightTopResize = (event: MouseEvent) => {
             initialMouseX.current = event.clientX;
             initialMouseY.current = event.clientY;
-            const styles = window.getComputedStyle(resizableEl);
-            initialElemWidth.current = parseInt(styles.width, 10);
-            initialElemHeight.current = parseInt(styles.height, 10);
-            initialElemLeft.current = parseInt(styles.left, 10);
-            initialElemTop.current = parseInt(styles.top, 10);
+
+            const { width, height } = getSize(resizableEl);
+            initialElemWidth.current = width;
+            initialElemHeight.current = height;
+
+            const { translateX, translateY } = getTranslate(resizableEl);
+            initialElemLeft.current = translateX;
+            initialElemTop.current = translateY;
 
             document.body.style.cursor = 'nesw-resize';
             document.addEventListener(
@@ -270,9 +304,10 @@ export default function useWindowResize({
         const handleMouseDownRightBottomResize = (event: MouseEvent) => {
             initialMouseX.current = event.clientX;
             initialMouseY.current = event.clientY;
-            const styles = window.getComputedStyle(resizableEl);
-            initialElemWidth.current = parseInt(styles.width, 10);
-            initialElemHeight.current = parseInt(styles.height, 10);
+
+            const { width, height } = getSize(resizableEl);
+            initialElemWidth.current = width;
+            initialElemHeight.current = height;
 
             document.body.style.cursor = 'nwse-resize';
             document.addEventListener(
@@ -291,9 +326,10 @@ export default function useWindowResize({
             const dy = event.clientY - initialMouseY.current;
             const newHeight = initialElemHeight.current + dy;
 
+            const { translateY } = getTranslate(resizableEl);
             if (newWidth >= MIN_WIDTH) {
                 resizableEl.style.width = `${newWidth}px`;
-                resizableEl.style.left = `${newLeft}px`;
+                resizableEl.style.transform = `translate(${newLeft}px, ${translateY}px)`;
             }
             if (newHeight >= MIN_HEIGHT) {
                 resizableEl.style.height = `${newHeight}px`;
@@ -303,11 +339,14 @@ export default function useWindowResize({
         const handleMouseDownLeftBottomResize = (event: MouseEvent) => {
             initialMouseX.current = event.clientX;
             initialMouseY.current = event.clientY;
-            const styles = window.getComputedStyle(resizableEl);
-            initialElemWidth.current = parseInt(styles.width, 10);
-            initialElemHeight.current = parseInt(styles.height, 10);
-            initialElemLeft.current = parseInt(styles.left, 10);
-            initialElemTop.current = parseInt(styles.top, 10);
+
+            const { width, height } = getSize(resizableEl);
+            initialElemWidth.current = width;
+            initialElemHeight.current = height;
+
+            const { translateX, translateY } = getTranslate(resizableEl);
+            initialElemLeft.current = translateX;
+            initialElemTop.current = translateY;
 
             document.body.style.cursor = 'nesw-resize';
             document.addEventListener(
@@ -361,7 +400,7 @@ export default function useWindowResize({
         return () => {
             handleCleanUp();
         };
-    }, [ref, workspace]);
+    }, [ref, setPosition, setSize, workspace]);
 
     return {
         leftRef,
@@ -372,6 +411,5 @@ export default function useWindowResize({
         rightTopRef,
         leftBottomRef,
         rightBottomRef,
-        currentRect,
     };
 }

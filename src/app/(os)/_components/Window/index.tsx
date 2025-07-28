@@ -2,10 +2,10 @@
 
 import type { ReactNode } from 'react';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Draggable from 'react-draggable';
 
-import type { Size, Window } from '@/os/_types';
+import type { Position, Size, Window } from '@/os/_types';
 
 import useWindowResize from '@/os/_hooks/useWindowResize';
 import { cn } from '@/utils/cn';
@@ -13,32 +13,34 @@ import { cn } from '@/utils/cn';
 import WindowHeader from './WindowHeader';
 
 interface WindowProps {
-    appId: string;
     window: Window;
     children: ReactNode;
     renderHeaderContent?: ReactNode;
     onClose?: () => void;
     onClick?: () => void;
     onHide?: () => void;
+    onUpdateRect?: (rect: { position?: Position; size?: Size }) => void;
 }
 
 export default function Window({
-    appId,
     window: _window,
     children,
     renderHeaderContent,
     onClose,
     onClick,
     onHide,
+    onUpdateRect,
 }: WindowProps) {
     const { position, size, isHide, zIndex } = _window;
+    const [syncPosition, setSyncPosition] = useState<Position>(position);
+    const [syncSize, setSyncSize] = useState<Size>(size);
 
     const [isMaximized, setIsMaximized] = useState(false);
 
     const nodeRef = useRef<HTMLDivElement>(null);
-    const prevTransform = useRef<string>('');
-    const prevSize = useRef<Size>(size);
 
+    const prevSizeRef = useRef<Size>(size);
+    const prevPositionRef = useRef<Position>(position);
     const {
         leftRef,
         rightRef,
@@ -50,6 +52,8 @@ export default function Window({
         rightBottomRef,
     } = useWindowResize({
         ref: nodeRef,
+        setSize: setSyncSize,
+        setPosition: setSyncPosition,
         workspace: '.workspace',
     });
 
@@ -62,32 +66,24 @@ export default function Window({
         if (!workspaceEl) return;
 
         const workspaceBounds = workspaceEl.getBoundingClientRect();
-        const nodeEl = nodeRef.current;
 
-        if (!nodeEl) return;
-
-        prevSize.current = {
-            width: nodeEl.clientWidth,
-            height: nodeEl.clientHeight,
+        prevSizeRef.current = {
+            width: syncSize.width,
+            height: syncSize.height,
         };
-        nodeEl.style.width = `${workspaceBounds.width}px`;
-        nodeEl.style.height = `${workspaceBounds.height}px`;
+        prevPositionRef.current = {
+            x: syncPosition.x,
+            y: syncPosition.y,
+        };
 
-        const nodeTransform = window.getComputedStyle(nodeEl).transform;
-        prevTransform.current = nodeTransform;
-
-        //DESC: Draggable 컴포넌트가 transform 속성을 사용하기 때문에 변경된 resize를 통해 변경된 left,top에 대한 보정 처리
-        const transformMatrix = new DOMMatrix(nodeTransform);
-        const translateX = transformMatrix.m41;
-        const translateY = transformMatrix.m42;
-
-        const nodeBounds = nodeEl.getBoundingClientRect();
-        const headerOffset = 40;
-
-        const newTranslateX = translateX - nodeBounds.x;
-        const newTranslateY = translateY - nodeBounds.y + headerOffset;
-
-        nodeEl.style.transform = `translate(${newTranslateX}px, ${newTranslateY}px)`;
+        setSyncSize({
+            width: workspaceBounds.width,
+            height: workspaceBounds.height,
+        });
+        setSyncPosition({
+            x: 0,
+            y: 0,
+        });
 
         setIsMaximized(true);
     };
@@ -96,10 +92,14 @@ export default function Window({
         const nodeEl = nodeRef.current;
         if (!nodeEl) return;
 
-        nodeEl.style.width = `${prevSize.current.width}px`;
-        nodeEl.style.height = `${prevSize.current.height}px`;
-
-        nodeEl.style.transform = prevTransform.current;
+        setSyncSize({
+            width: prevSizeRef.current.width,
+            height: prevSizeRef.current.height,
+        });
+        setSyncPosition({
+            x: prevPositionRef.current.x,
+            y: prevPositionRef.current.y,
+        });
 
         setIsMaximized(false);
     };
@@ -110,13 +110,14 @@ export default function Window({
             handle=".window-title-bar"
             bounds=".workspace"
             disabled={isMaximized}
-            defaultPosition={position}
+            position={syncPosition}
             defaultClassName={cn('left-0 top-0', isHide && 'invisible')}
             onStart={() => {
                 document.body.style.cursor = 'grabbing';
             }}
-            onStop={() => {
+            onStop={(_, data) => {
                 document.body.style.cursor = 'default';
+                setSyncPosition(data);
             }}
         >
             <div
@@ -128,8 +129,8 @@ export default function Window({
                     'overflow-hidden',
                 )}
                 style={{
-                    width: size.width,
-                    height: size.height,
+                    width: syncSize.width,
+                    height: syncSize.height,
                     zIndex,
                 }}
                 onClick={handleClickWindow}
