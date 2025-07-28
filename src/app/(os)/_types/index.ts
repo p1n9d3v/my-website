@@ -24,7 +24,7 @@ export interface Window {
     isHide: boolean;
 }
 
-export interface Process {
+export interface App {
     id: string;
     name: string;
     window: Window;

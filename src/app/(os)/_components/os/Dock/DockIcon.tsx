@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { cn } from '@/utils/cn';
 
-import type { DockApp } from '../../_types';
+import type { DockApp } from '../../../_types';
 
 interface DockIconProps {
     app: DockApp;
@@ -31,10 +31,10 @@ export default function DockIcon({ app }: DockIconProps) {
             {isHovered && (
                 <div
                     className={cn(
-                        'absolute -top-10 left-1/2 transform -translate-x-1/2',
+                        'absolute -top-10 left-1/2 -translate-x-1/2 transform',
                         'bg-white/40 backdrop-blur-sm',
-                        'text-white text-xs font-medium',
-                        'px-2 py-1 rounded-md',
+                        'text-xs font-medium text-white',
+                        'rounded-md px-2 py-1',
                         'whitespace-nowrap',
                     )}
                 >
@@ -48,19 +48,19 @@ export default function DockIcon({ app }: DockIconProps) {
                 onContextMenu={(e) => handleAppRightClick(e, app)}
                 className={cn(
                     'group',
-                    'w-14 h-14',
+                    'h-14 w-14',
                     'flex items-center justify-center',
                     'rounded-xl transition-all duration-300 ease-out',
-                    'hover:bg-white/90 cursor-pointer',
-                    'hover:transform hover:-translate-y-2 hover:scale-110',
+                    'cursor-pointer hover:bg-white/90',
+                    'hover:-translate-y-2 hover:scale-110 hover:transform',
                     'active:scale-95',
                 )}
                 aria-label={`${app.name} ${app.isRunning ? '(실행 중)' : ''}`}
             >
                 <IconComponent
                     className={cn(
-                        'w-8 h-8',
-                        'text-white transition-all duration-300 drop-shadow-sm',
+                        'h-8 w-8',
+                        'text-white drop-shadow-sm transition-all duration-300',
                         'group-hover:text-black/80',
                     )}
                 />
@@ -71,7 +71,7 @@ export default function DockIcon({ app }: DockIconProps) {
                 <div
                     className={cn(
                         'absolute -bottom-1',
-                        'w-1 h-1',
+                        'h-1 w-1',
                         'rounded-full bg-white/80',
                     )}
                 />

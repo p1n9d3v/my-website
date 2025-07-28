@@ -55,18 +55,18 @@ export default function MenuBar() {
     return (
         <div
             className={cn(
-                'fixed top-0 left-0 right-0 h-10 z-50 ',
-                'bg-black/20 backdrop-blur-md border-b border-white/10',
+                'fixed top-0 right-0 left-0 z-50 h-10',
+                'border-b border-white/10 bg-black/20 backdrop-blur-md',
             )}
         >
-            <div className="flex items-center justify-between h-full px-4">
+            <div className="flex h-full items-center justify-between px-4">
                 <div className="flex items-center space-x-4">
                     <button
                         onClick={handleAppleMenuClick}
                         className={cn(buttonStyles, 'px-2')}
                         aria-label="Apple 메뉴"
                     >
-                        <Circle className="w-3 h-3 fill-current" />
+                        <Circle className="h-3 w-3 fill-current" />
                     </button>
 
                     <span className="text-sm font-medium">P1n9</span>
@@ -88,7 +88,7 @@ export default function MenuBar() {
                     <div
                         className={cn(
                             'flex items-center gap-2',
-                            'text-sm font-medium text-right',
+                            'text-right text-sm font-medium',
                         )}
                     >
                         <div>{currentTime}</div>
@@ -101,7 +101,7 @@ export default function MenuBar() {
                         title="Spotlight 검색 (⌘Space)"
                         aria-label="검색"
                     >
-                        <Search className="w-4 h-4" />
+                        <Search className="h-4 w-4" />
                     </button>
 
                     <button
@@ -109,7 +109,7 @@ export default function MenuBar() {
                         title="제어"
                         aria-label="제어"
                     >
-                        <MoreHorizontal className="w-4 h-4" />
+                        <MoreHorizontal className="h-4 w-4" />
                     </button>
                 </div>
             </div>

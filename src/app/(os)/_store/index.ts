@@ -1,9 +1,9 @@
 import { create } from 'zustand';
 
-import { useProcessSlice, type ProcessSlice } from './slices/process';
+import { useAppSlice, type AppSlice } from './slices/app';
 
-type CombinedState = ProcessSlice;
+type CombinedState = AppSlice;
 
 export const useOSStore = create<CombinedState>((...a) => ({
-    ...useProcessSlice(...a),
+    ...useAppSlice(...a),
 }));

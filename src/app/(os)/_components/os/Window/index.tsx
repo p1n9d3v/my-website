@@ -7,24 +7,29 @@ import Draggable from 'react-draggable';
 
 import { cn } from '@/utils/cn';
 
-import type { Size, Window } from '../../_types';
+import type { Size, Window } from '../../../_types';
 
-import useWindowResize from '../../_hooks/useWindowResize';
-import { useOSStore } from '../../_store';
+import useWindowResize from '../../../_hooks/useWindowResize';
 import WindowHeader from './WindowHeader';
 
 interface WindowProps {
-    processId: string;
+    appId: string;
     window: Window;
     children: ReactNode;
     renderHeaderContent?: ReactNode;
+    onClose?: () => void;
+    onClick?: () => void;
+    onHide?: () => void;
 }
 
 export default function Window({
-    processId,
+    appId,
     window: _window,
     children,
     renderHeaderContent,
+    onClose,
+    onClick,
+    onHide,
 }: WindowProps) {
     const { position, size, isHide, zIndex } = _window;
 
@@ -33,8 +38,6 @@ export default function Window({
     const nodeRef = useRef<HTMLDivElement>(null);
     const prevTransform = useRef<string>('');
     const prevSize = useRef<Size>(size);
-
-    const { terminateProcess, focusProcess, hideProcess } = useOSStore();
 
     const {
         leftRef,
@@ -50,9 +53,9 @@ export default function Window({
         workspace: '.workspace',
     });
 
-    const handleCloseWindow = () => terminateProcess(processId);
-    const handleClickWindow = () => focusProcess(processId);
-    const handleHideWindow = () => hideProcess(processId);
+    const handleCloseWindow = () => onClose && onClose();
+    const handleClickWindow = () => onClick && onClick();
+    const handleHideWindow = () => onHide && onHide();
 
     const handleMaximizeWindow = () => {
         const workspaceEl = document.querySelector('.workspace');

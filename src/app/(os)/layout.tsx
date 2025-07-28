@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
 
-import Dock from './_components/Dock';
-import MenuBar from './_components/MenuBar';
-import WallPaper from './_components/WallPaper';
+import Dock from './_components/os/Dock';
+import MenuBar from './_components/os/MenuBar';
+import WallPaper from './_components/os/WallPaper';
 
 interface OSLayoutProps {
     children: ReactNode;

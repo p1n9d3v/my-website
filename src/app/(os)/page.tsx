@@ -3,8 +3,9 @@
 import { Folder } from 'lucide-react';
 import { nanoid } from 'nanoid';
 
-import Program from './_components/Program';
-import Window from './_components/Window';
+import Window from '@/os/_components/os/Window';
+
+import Program from './_components/os/Program';
 import { useOSStore } from './_store';
 
 const PROGRAMS = [
@@ -16,7 +17,7 @@ const PROGRAMS = [
 ];
 
 export default function Page() {
-    const processes = useOSStore((state) => state.processes);
+    const runningApps = useOSStore((state) => state.runningApps);
 
     return (
         <>
@@ -28,10 +29,10 @@ export default function Page() {
                     icon={program.icon}
                 />
             ))}
-            {Object.values(processes).map((process) => (
+            {Object.values(runningApps).map((process) => (
                 <Window
                     key={process.id}
-                    processId={process.id}
+                    appId={process.id}
                     window={process.window}
                     renderHeaderContent={
                         <div className="absolute top-0 left-1/2 -translate-x-1/2 transform">

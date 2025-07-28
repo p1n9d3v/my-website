@@ -1,7 +1,7 @@
 import { useRef, type ComponentProps, type ReactNode } from 'react';
 import Draggable from 'react-draggable';
 
-import { useOSStore } from '../_store';
+import { useOSStore } from '@/os/_store';
 
 interface ProgramProps extends ComponentProps<'button'> {
     icon: ReactNode;
@@ -11,10 +11,10 @@ interface ProgramProps extends ComponentProps<'button'> {
 
 export default function Program({ icon, name, id, ...rest }: ProgramProps) {
     const nodeRef = useRef<HTMLButtonElement>(null);
-    const registerWindow = useOSStore((state) => state.launchProgram);
+    const launchApp = useOSStore((state) => state.launchApp);
 
     const handleLaunchProcess = () => {
-        registerWindow({
+        launchApp({
             id,
             name,
         });

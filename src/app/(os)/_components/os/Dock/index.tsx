@@ -14,7 +14,7 @@ import {
 
 import { cn } from '@/utils/cn';
 
-import type { DockApp } from '../../_types';
+import type { DockApp } from '../../../_types';
 
 import DockIcon from './DockIcon';
 
