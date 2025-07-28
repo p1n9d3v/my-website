@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react';
 import type { DraggableData, DraggableEvent } from 'react-draggable';
 
-import { useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import Draggable from 'react-draggable';
 
 import type { AppContext, Bounds } from '@/os/_types';
@@ -26,11 +26,18 @@ export default function Window({
     renderHeaderContent,
 }: WindowProps) {
     const { id: appId, window: _window } = app;
-    const { bounds, prevBounds, isHide, zIndex, isMaximized } = _window;
+    const { bounds, isHide, zIndex, isMaximized } = _window;
 
     const nodeRef = useRef<HTMLDivElement>(null);
 
-    const { updateWindowBounds, hideApp, terminateApp } = useOSStore();
+    const {
+        resizeWindow,
+        hideApp,
+        terminateApp,
+        maximizeWindow,
+        restoreWindow,
+        dragWindow,
+    } = useOSStore();
 
     const {
         leftRef,
@@ -44,11 +51,10 @@ export default function Window({
     } = useWindowResize({
         ref: nodeRef,
         workspace: '.workspace',
-        onUpdateBounds: (bounds) =>
-            handleUpdateWindowBounds({
-                bounds,
-                isMaximized: false,
-            }),
+        onUpdateBounds: useCallback(
+            (bounds: Bounds) => resizeWindow(appId, bounds),
+            [appId, resizeWindow],
+        ),
     });
 
     const handleHideWindow = () => {
@@ -59,24 +65,7 @@ export default function Window({
         terminateApp(appId);
     };
 
-    const handleUpdateWindowBounds = ({
-        bounds,
-        prevBounds,
-        isMaximized,
-    }: {
-        bounds: Bounds;
-        prevBounds?: Bounds;
-        isMaximized?: boolean;
-    }) => {
-        updateWindowBounds({
-            appId,
-            bounds,
-            prevBounds,
-            isMaximized,
-        });
-    };
-
-    const handleMaximizeWindow = () => {
+    const handleMaximizeWindow = useCallback(() => {
         const workspaceEl = document.querySelector('.workspace');
         if (!workspaceEl) return;
 
@@ -94,29 +83,21 @@ export default function Window({
             height: workspaceBounds.height,
         };
 
-        handleUpdateWindowBounds?.({
+        maximizeWindow({
+            appId,
             bounds: updatedBounds,
             prevBounds: {
                 ...bounds,
             },
-            isMaximized: true,
         });
-    };
+    }, [appId, bounds, maximizeWindow]);
 
     const handleRestoreWindow = () => {
         const nodeEl = nodeRef.current;
         if (!nodeEl) return;
 
+        restoreWindow(appId);
         nodeEl.style.transition = 'all 0.2s linear';
-
-        if (prevBounds) {
-            handleUpdateWindowBounds?.({
-                bounds: {
-                    ...prevBounds,
-                },
-                isMaximized: false,
-            });
-        }
     };
 
     const handleStartDrag = () => {
@@ -125,16 +106,41 @@ export default function Window({
 
     const handleStopDrag = (_: DraggableEvent, data: DraggableData) => {
         document.body.style.cursor = 'default';
-        const updatedBounds = {
-            ...bounds,
+        dragWindow(appId, {
             x: data.x,
             y: data.y,
-        };
-        handleUpdateWindowBounds?.({
-            bounds: updatedBounds,
-            isMaximized: false,
         });
     };
+
+    //DESC: Browser Window Resize 처리
+    useEffect(() => {
+        if (isMaximized) {
+            const handleMaximizeWindow = () => {
+                const workspaceEl = document.querySelector('.workspace');
+                if (!workspaceEl) return;
+
+                const workspaceBounds = workspaceEl.getBoundingClientRect();
+
+                const updatedBounds = {
+                    x: 0,
+                    y: 0,
+                    width: workspaceBounds.width,
+                    height: workspaceBounds.height,
+                };
+
+                maximizeWindow({
+                    appId,
+                    bounds: updatedBounds,
+                });
+            };
+            window.addEventListener('resize', handleMaximizeWindow);
+
+            return () => {
+                console.log('unmount');
+                window.removeEventListener('resize', handleMaximizeWindow);
+            };
+        }
+    }, [appId, isMaximized, maximizeWindow]);
 
     return (
         <Draggable

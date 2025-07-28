@@ -17,17 +17,18 @@ export interface AppStoreActions {
     activeApp: (appId: string) => void;
     terminateApp: (appId: string) => void;
     hideApp: (appId: string) => void;
-    updateWindowBounds: ({
+    dragWindow: (appId: string, bounds: Pick<Bounds, 'x' | 'y'>) => void;
+    resizeWindow: (appId: string, bounds: Bounds) => void;
+    maximizeWindow: ({
         appId,
         bounds,
         prevBounds,
-        isMaximized,
     }: {
         appId: string;
         bounds: Bounds;
-        isMaximized?: boolean;
         prevBounds?: Bounds;
     }) => void;
+    restoreWindow: (appId: string) => void;
 }
 
 export type AppSlice = AppStoreStates & AppStoreActions;
@@ -88,15 +89,37 @@ export const useAppSlice = immer<AppSlice>((set) => ({
             );
         });
     },
-    updateWindowBounds: ({ appId, bounds, prevBounds, isMaximized }) => {
+    dragWindow: (appId, bounds) => {
         set((state) => {
-            state.appContexts[appId].window.bounds = bounds;
-            if (isMaximized) {
-                state.appContexts[appId].window.prevBounds = prevBounds;
-            } else {
-                state.appContexts[appId].window.prevBounds = undefined;
-            }
-            state.appContexts[appId].window.isMaximized = isMaximized ?? false;
+            state.appContexts[appId].window.bounds = {
+                ...state.appContexts[appId].window.bounds,
+                ...bounds,
+            };
+        });
+    },
+    resizeWindow: (appId, bounds) => {
+        set((state) => {
+            const window = state.appContexts[appId].window;
+
+            window.bounds = bounds;
+            window.prevBounds = undefined;
+            window.isMaximized = false;
+        });
+    },
+    maximizeWindow: ({ appId, bounds, prevBounds }) => {
+        set((state) => {
+            const window = state.appContexts[appId].window;
+            window.bounds = bounds;
+            window.prevBounds = prevBounds ?? window.prevBounds;
+            window.isMaximized = true;
+        });
+    },
+    restoreWindow: (appId) => {
+        set((state) => {
+            const window = state.appContexts[appId].window;
+            window.bounds = window.prevBounds!;
+            window.prevBounds = undefined;
+            window.isMaximized = false;
         });
     },
 }));

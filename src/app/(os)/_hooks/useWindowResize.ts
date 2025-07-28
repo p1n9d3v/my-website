@@ -1,4 +1,4 @@
-import { useEffect, useRef, type RefObject } from 'react';
+import { useCallback, useEffect, useRef, type RefObject } from 'react';
 
 import type { Bounds } from '../_types';
 
@@ -7,7 +7,7 @@ import { MIN_HEIGHT, MIN_WIDTH } from '../_constants';
 interface UseWindowResizeProps {
     ref: RefObject<HTMLDivElement | null>;
     workspace: string;
-    onUpdateBounds?: (bounds: Bounds) => void;
+    onUpdateBounds: (bounds: Bounds) => void;
 }
 
 export default function useWindowResize({
@@ -31,15 +31,15 @@ export default function useWindowResize({
     const initialElemLeft = useRef(0);
     const initialElemTop = useRef(0);
 
-    const getSize = (el: HTMLElement) => {
+    const getSize = useCallback((el: HTMLElement) => {
         const styles = window.getComputedStyle(el);
         return {
             width: parseInt(styles.width, 10),
             height: parseInt(styles.height, 10),
         };
-    };
+    }, []);
 
-    const getTranslate = (el: HTMLElement) => {
+    const getTranslate = useCallback((el: HTMLElement) => {
         const transformMatrix = new DOMMatrix(
             window.getComputedStyle(el).transform,
         );
@@ -47,7 +47,7 @@ export default function useWindowResize({
         const translateY = transformMatrix.m42;
 
         return { translateX, translateY };
-    };
+    }, []);
 
     useEffect(() => {
         const resizableEl = ref.current;
@@ -90,12 +90,8 @@ export default function useWindowResize({
         const updateBounds = () => {
             const { translateX, translateY } = getTranslate(resizableEl);
             const { width, height } = getSize(resizableEl);
-            onUpdateBounds?.({
-                x: translateX,
-                y: translateY,
-                width,
-                height,
-            });
+
+            onUpdateBounds?.({ x: translateX, y: translateY, width, height });
         };
 
         // NOTE: RIGHT
@@ -485,7 +481,7 @@ export default function useWindowResize({
         return () => {
             handleCleanUp();
         };
-    }, [workspace]);
+    }, [ref, workspace, getSize, getTranslate, onUpdateBounds]);
 
     return {
         leftRef,
