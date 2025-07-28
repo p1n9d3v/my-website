@@ -27,6 +27,13 @@ export interface Window {
 export interface App {
     id: string;
     name: string;
+    Icon: ComponentType<any>;
+    Component: ComponentType<any>;
+}
+
+export interface AppContext {
+    id: string;
+    name: string;
     window: Window;
 }
 

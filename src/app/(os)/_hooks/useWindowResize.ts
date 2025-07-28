@@ -1,15 +1,19 @@
 import { useEffect, useRef, type RefObject } from 'react';
 
+import type { Position, Size } from '../_types';
+
 import { MIN_HEIGHT, MIN_WIDTH } from '../_constants';
 
 interface UseWindowResizeProps {
     ref: RefObject<HTMLDivElement | null>;
     workspace: string;
+    onUpdateRect?: (rect: { position?: Position; size?: Size }) => void;
 }
 
 export default function useWindowResize({
     ref,
     workspace,
+    onUpdateRect,
 }: UseWindowResizeProps) {
     const leftRef = useRef<HTMLDivElement>(null);
     const rightRef = useRef<HTMLDivElement>(null);
@@ -27,12 +31,19 @@ export default function useWindowResize({
     const initialElemLeft = useRef(0);
     const initialElemTop = useRef(0);
 
+    const currentRect = useRef<{
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+    }>({ x: 0, y: 0, width: 0, height: 0 });
+
     useEffect(() => {
         const resizableEl = ref.current;
         const workspaceEl = document.querySelector(workspace);
         if (!resizableEl || !workspaceEl) return;
 
-        const handleMouseUp = () => {
+        const handleCleanUp = () => {
             document.removeEventListener(
                 'mousemove',
                 handleMouseMoveRightResize,
@@ -62,8 +73,11 @@ export default function useWindowResize({
                 'mousemove',
                 handleMouseMoveLeftBottomResize,
             );
+        };
 
+        const handleMouseUp = () => {
             document.body.style.cursor = 'default';
+            handleCleanUp();
             document.removeEventListener('mouseup', handleMouseUp);
         };
 
@@ -166,10 +180,22 @@ export default function useWindowResize({
             if (newWidth >= MIN_WIDTH) {
                 resizableEl.style.width = `${newWidth}px`;
                 resizableEl.style.left = `${newLeft}px`;
+
+                currentRect.current = {
+                    ...currentRect.current,
+                    x: newLeft,
+                    width: newWidth,
+                };
             }
             if (newHeight >= MIN_HEIGHT) {
                 resizableEl.style.height = `${newHeight}px`;
                 resizableEl.style.top = `${newTop}px`;
+
+                currentRect.current = {
+                    ...currentRect.current,
+                    y: newTop,
+                    height: newHeight,
+                };
             }
         };
 
@@ -333,43 +359,9 @@ export default function useWindowResize({
         workspaceEl.addEventListener('mouseleave', handleMouseUp);
 
         return () => {
-            // Clean up all event listeners when the component unmounts
-            resizerRight?.removeEventListener(
-                'mousedown',
-                handleMouseDownRightResize,
-            );
-            resizerTop?.removeEventListener(
-                'mousedown',
-                handleMouseDownTopResize,
-            );
-            resizerBottom?.removeEventListener(
-                'mousedown',
-                handleMouseDownBottomResize,
-            );
-            resizerLeft?.removeEventListener(
-                'mousedown',
-                handleMouseDownLeftResize,
-            );
-            resizerLeftTop?.removeEventListener(
-                'mousedown',
-                handleMouseDownLeftTopResize,
-            );
-            resizerRightTop?.removeEventListener(
-                'mousedown',
-                handleMouseDownRightTopResize,
-            );
-            resizerRightBottom?.removeEventListener(
-                'mousedown',
-                handleMouseDownRightBottomResize,
-            );
-            resizerLeftBottom?.removeEventListener(
-                'mousedown',
-                handleMouseDownLeftBottomResize,
-            );
-            handleMouseUp(); // This will remove the mousemove and mouseup listeners
-            workspaceEl.removeEventListener('mouseleave', handleMouseUp);
+            handleCleanUp();
         };
-    }, [ref, workspace]); // Added workspace to the dependency array as it's used in the effect
+    }, [ref, workspace]);
 
     return {
         leftRef,
@@ -380,5 +372,6 @@ export default function useWindowResize({
         rightTopRef,
         leftBottomRef,
         rightBottomRef,
+        currentRect,
     };
 }

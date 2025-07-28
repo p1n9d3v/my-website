@@ -39,6 +39,7 @@ export default function WindowHeader({
                     {/*DESC: 닫기 버튼 */}
                     <button
                         onClick={onClose}
+                        onMouseDown={(event) => event.stopPropagation()}
                         className={cn(
                             'h-3 w-3 rounded-full bg-red-500',
                             'transition-colors hover:bg-red-600',
@@ -56,6 +57,7 @@ export default function WindowHeader({
                     {/*DESC: 숨김 버튼 */}
                     <button
                         onClick={onHide}
+                        onMouseDown={(event) => event.stopPropagation()}
                         className={cn(
                             'h-3 w-3 rounded-full bg-yellow-500',
                             'transition-colors hover:bg-yellow-600',
@@ -73,6 +75,7 @@ export default function WindowHeader({
                     {/*DESC: 최대화/최소화 버튼 */}
                     <button
                         onClick={isMaximized ? onRestore : onMaximize}
+                        onMouseDown={(event) => event.stopPropagation()}
                         className={cn(
                             'h-3 w-3 rounded-full bg-green-500',
                             'transition-colors hover:bg-green-600',
