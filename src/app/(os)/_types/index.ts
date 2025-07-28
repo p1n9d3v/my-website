@@ -17,11 +17,19 @@ export interface Size {
     height: number;
 }
 
+export interface Bounds {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+}
+
 export interface Window {
-    position: Position;
+    bounds: Bounds;
+    prevBounds?: Bounds;
     zIndex: number;
-    size: Size;
     isHide: boolean;
+    isMaximized: boolean;
 }
 
 export interface App {

@@ -1,46 +1,37 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import type { DraggableData, DraggableEvent } from 'react-draggable';
 
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import Draggable from 'react-draggable';
 
-import type { Position, Size, Window } from '@/os/_types';
+import type { AppContext, Bounds } from '@/os/_types';
 
 import useWindowResize from '@/os/_hooks/useWindowResize';
 import { cn } from '@/utils/cn';
 
+import { useOSStore } from '../../_store';
 import WindowHeader from './WindowHeader';
 
 interface WindowProps {
-    window: Window;
+    app: AppContext;
     children: ReactNode;
     renderHeaderContent?: ReactNode;
-    onClose?: () => void;
-    onClick?: () => void;
-    onHide?: () => void;
-    onUpdateRect?: (rect: { position?: Position; size?: Size }) => void;
 }
 
 export default function Window({
-    window: _window,
+    app,
     children,
     renderHeaderContent,
-    onClose,
-    onClick,
-    onHide,
-    onUpdateRect,
 }: WindowProps) {
-    const { position, size, isHide, zIndex } = _window;
-    const [syncPosition, setSyncPosition] = useState<Position>(position);
-    const [syncSize, setSyncSize] = useState<Size>(size);
-
-    const [isMaximized, setIsMaximized] = useState(false);
+    const { id: appId, window: _window } = app;
+    const { bounds, prevBounds, isHide, zIndex, isMaximized } = _window;
 
     const nodeRef = useRef<HTMLDivElement>(null);
 
-    const prevSizeRef = useRef<Size>(size);
-    const prevPositionRef = useRef<Position>(position);
+    const { updateWindowBounds, hideApp, terminateApp } = useOSStore();
+
     const {
         leftRef,
         rightRef,
@@ -52,14 +43,38 @@ export default function Window({
         rightBottomRef,
     } = useWindowResize({
         ref: nodeRef,
-        onUpdateSize: (size) => setSyncSize(size),
-        onUpdatePosition: (position) => setSyncPosition(position),
         workspace: '.workspace',
+        onUpdateBounds: (bounds) =>
+            handleUpdateWindowBounds({
+                bounds,
+                isMaximized: false,
+            }),
     });
 
-    const handleCloseWindow = () => onClose && onClose();
-    const handleClickWindow = () => onClick && onClick();
-    const handleHideWindow = () => onHide && onHide();
+    const handleHideWindow = () => {
+        hideApp(appId);
+    };
+
+    const handleTerminateWindow = () => {
+        terminateApp(appId);
+    };
+
+    const handleUpdateWindowBounds = ({
+        bounds,
+        prevBounds,
+        isMaximized,
+    }: {
+        bounds: Bounds;
+        prevBounds?: Bounds;
+        isMaximized?: boolean;
+    }) => {
+        updateWindowBounds({
+            appId,
+            bounds,
+            prevBounds,
+            isMaximized,
+        });
+    };
 
     const handleMaximizeWindow = () => {
         const workspaceEl = document.querySelector('.workspace');
@@ -72,25 +87,20 @@ export default function Window({
 
         nodeEl.style.transition = 'all 0.2s linear';
 
-        prevSizeRef.current = {
-            width: syncSize.width,
-            height: syncSize.height,
-        };
-        prevPositionRef.current = {
-            x: syncPosition.x,
-            y: syncPosition.y,
-        };
-
-        setSyncSize({
-            width: workspaceBounds.width,
-            height: workspaceBounds.height,
-        });
-        setSyncPosition({
+        const updatedBounds = {
             x: 0,
             y: 0,
-        });
+            width: workspaceBounds.width,
+            height: workspaceBounds.height,
+        };
 
-        setIsMaximized(true);
+        handleUpdateWindowBounds?.({
+            bounds: updatedBounds,
+            prevBounds: {
+                ...bounds,
+            },
+            isMaximized: true,
+        });
     };
 
     const handleRestoreWindow = () => {
@@ -99,16 +109,31 @@ export default function Window({
 
         nodeEl.style.transition = 'all 0.2s linear';
 
-        setSyncSize({
-            width: prevSizeRef.current.width,
-            height: prevSizeRef.current.height,
-        });
-        setSyncPosition({
-            x: prevPositionRef.current.x,
-            y: prevPositionRef.current.y,
-        });
+        if (prevBounds) {
+            handleUpdateWindowBounds?.({
+                bounds: {
+                    ...prevBounds,
+                },
+                isMaximized: false,
+            });
+        }
+    };
 
-        setIsMaximized(false);
+    const handleStartDrag = () => {
+        document.body.style.cursor = 'grabbing';
+    };
+
+    const handleStopDrag = (_: DraggableEvent, data: DraggableData) => {
+        document.body.style.cursor = 'default';
+        const updatedBounds = {
+            ...bounds,
+            x: data.x,
+            y: data.y,
+        };
+        handleUpdateWindowBounds?.({
+            bounds: updatedBounds,
+            isMaximized: false,
+        });
     };
 
     return (
@@ -117,15 +142,10 @@ export default function Window({
             handle=".window-title-bar"
             bounds=".workspace"
             disabled={isMaximized}
-            position={syncPosition}
+            position={bounds}
             defaultClassName={cn('left-0 top-0', isHide && 'invisible')}
-            onStart={() => {
-                document.body.style.cursor = 'grabbing';
-            }}
-            onStop={(_, data) => {
-                document.body.style.cursor = 'default';
-                setSyncPosition(data);
-            }}
+            onStart={handleStartDrag}
+            onStop={handleStopDrag}
         >
             <div
                 ref={nodeRef}
@@ -136,8 +156,8 @@ export default function Window({
                     'overflow-hidden',
                 )}
                 style={{
-                    width: syncSize.width,
-                    height: syncSize.height,
+                    width: bounds.width,
+                    height: bounds.height,
                     zIndex,
                 }}
                 onTransitionEnd={() => {
@@ -146,13 +166,12 @@ export default function Window({
 
                     nodeEl.style.transition = '';
                 }}
-                onClick={handleClickWindow}
             >
                 <WindowHeader
                     className="window-title-bar"
                     isMaximized={isMaximized}
                     renderContent={renderHeaderContent}
-                    onClose={handleCloseWindow}
+                    onClose={handleTerminateWindow}
                     onMaximize={handleMaximizeWindow}
                     onRestore={handleRestoreWindow}
                     onHide={handleHideWindow}

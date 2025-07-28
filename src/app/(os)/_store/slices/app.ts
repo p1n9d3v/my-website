@@ -1,6 +1,6 @@
 import { immer } from 'zustand/middleware/immer';
 
-import type { App, AppContext, Position, Size } from '@/os/_types';
+import type { App, AppContext, Bounds } from '@/os/_types';
 
 import { APPS, MIN_HEIGHT, MIN_WIDTH } from '@/os/_constants';
 
@@ -17,13 +17,17 @@ export interface AppStoreActions {
     activeApp: (appId: string) => void;
     terminateApp: (appId: string) => void;
     hideApp: (appId: string) => void;
-    updateWindowRect: (
-        appId: string,
-        rect: {
-            position?: Position;
-            size?: Size;
-        },
-    ) => void;
+    updateWindowBounds: ({
+        appId,
+        bounds,
+        prevBounds,
+        isMaximized,
+    }: {
+        appId: string;
+        bounds: Bounds;
+        isMaximized?: boolean;
+        prevBounds?: Bounds;
+    }) => void;
 }
 
 export type AppSlice = AppStoreStates & AppStoreActions;
@@ -39,11 +43,10 @@ export const useAppSlice = immer<AppSlice>((set) => ({
             let context = state.appContexts[appId];
             if (!context) {
                 const { name } = state.apps[appId];
-                const windowPosition = {
+
+                const bounds = {
                     x: window.innerWidth / 2 - MIN_WIDTH / 2,
                     y: window.innerHeight / 2 - MIN_HEIGHT / 2,
-                };
-                const windowSize = {
                     width: MIN_WIDTH,
                     height: MIN_HEIGHT,
                 };
@@ -51,10 +54,10 @@ export const useAppSlice = immer<AppSlice>((set) => ({
                     id: appId,
                     name: name,
                     window: {
-                        position: windowPosition,
-                        size: windowSize,
+                        bounds,
                         isHide: false,
                         zIndex: state.activeCounter,
+                        isMaximized: false,
                     },
                 };
             }
@@ -85,27 +88,15 @@ export const useAppSlice = immer<AppSlice>((set) => ({
             );
         });
     },
-    updateWindowRect: (appId, rect) => {
+    updateWindowBounds: ({ appId, bounds, prevBounds, isMaximized }) => {
         set((state) => {
-            state.appContexts[appId].window = {
-                ...state.appContexts[appId].window,
-                position: {
-                    x:
-                        rect.position?.x ??
-                        state.appContexts[appId].window.position.x,
-                    y:
-                        rect.position?.y ??
-                        state.appContexts[appId].window.position.y,
-                },
-                size: {
-                    width:
-                        rect.size?.width ??
-                        state.appContexts[appId].window.size.width,
-                    height:
-                        rect.size?.height ??
-                        state.appContexts[appId].window.size.height,
-                },
-            };
+            state.appContexts[appId].window.bounds = bounds;
+            if (isMaximized) {
+                state.appContexts[appId].window.prevBounds = prevBounds;
+            } else {
+                state.appContexts[appId].window.prevBounds = undefined;
+            }
+            state.appContexts[appId].window.isMaximized = isMaximized ?? false;
         });
     },
 }));

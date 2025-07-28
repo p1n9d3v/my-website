@@ -1,21 +1,19 @@
 import { useEffect, useRef, type RefObject } from 'react';
 
-import type { Position, Size } from '../_types';
+import type { Bounds } from '../_types';
 
 import { MIN_HEIGHT, MIN_WIDTH } from '../_constants';
 
 interface UseWindowResizeProps {
     ref: RefObject<HTMLDivElement | null>;
     workspace: string;
-    onUpdateSize: (size: Size) => void;
-    onUpdatePosition: (position: Position) => void;
+    onUpdateBounds?: (bounds: Bounds) => void;
 }
 
 export default function useWindowResize({
     ref,
     workspace,
-    onUpdateSize,
-    onUpdatePosition,
+    onUpdateBounds,
 }: UseWindowResizeProps) {
     const leftRef = useRef<HTMLDivElement>(null);
     const rightRef = useRef<HTMLDivElement>(null);
@@ -86,25 +84,18 @@ export default function useWindowResize({
                 'mousemove',
                 handleMouseMoveLeftBottomResize,
             );
+            document.removeEventListener('mouseup', handleCleanUp);
         };
 
-        const handleMouseUp = () => {
-            document.body.style.cursor = 'default';
-
-            handleCleanUp();
-
+        const updateBounds = () => {
             const { translateX, translateY } = getTranslate(resizableEl);
             const { width, height } = getSize(resizableEl);
-            onUpdatePosition({
+            onUpdateBounds?.({
                 x: translateX,
                 y: translateY,
-            });
-            onUpdateSize({
                 width,
                 height,
             });
-
-            document.removeEventListener('mouseup', handleMouseUp);
         };
 
         // NOTE: RIGHT
@@ -117,6 +108,16 @@ export default function useWindowResize({
             }
         };
 
+        const handleMouseUpRightResize = () => {
+            document.body.style.cursor = 'default';
+            document.removeEventListener(
+                'mousemove',
+                handleMouseMoveRightResize,
+            );
+            updateBounds();
+            document.removeEventListener('mouseup', handleMouseUpRightResize);
+        };
+
         const handleMouseDownRightResize = (event: MouseEvent) => {
             initialMouseX.current = event.clientX;
 
@@ -125,7 +126,7 @@ export default function useWindowResize({
 
             document.body.style.cursor = 'ew-resize';
             document.addEventListener('mousemove', handleMouseMoveRightResize);
-            document.addEventListener('mouseup', handleMouseUp);
+            document.addEventListener('mouseup', handleMouseUpRightResize);
         };
 
         // NOTE: TOP
@@ -142,6 +143,13 @@ export default function useWindowResize({
             }
         };
 
+        const handleMouseUpTopResize = () => {
+            document.body.style.cursor = 'default';
+            document.removeEventListener('mousemove', handleMouseMoveTopResize);
+            updateBounds();
+            document.removeEventListener('mouseup', handleMouseUpTopResize);
+        };
+
         const handleMouseDownTopResize = (event: MouseEvent) => {
             initialMouseY.current = event.clientY;
 
@@ -153,7 +161,7 @@ export default function useWindowResize({
 
             document.body.style.cursor = 'ns-resize';
             document.addEventListener('mousemove', handleMouseMoveTopResize);
-            document.addEventListener('mouseup', handleMouseUp);
+            document.addEventListener('mouseup', handleMouseUpTopResize);
         };
 
         // NOTE: BOTTOM
@@ -166,6 +174,16 @@ export default function useWindowResize({
             }
         };
 
+        const handleMouseUpBottomResize = () => {
+            document.body.style.cursor = 'default';
+            document.removeEventListener(
+                'mousemove',
+                handleMouseMoveBottomResize,
+            );
+            updateBounds();
+            document.removeEventListener('mouseup', handleMouseUpBottomResize);
+        };
+
         const handleMouseDownBottomResize = (event: MouseEvent) => {
             initialMouseY.current = event.clientY;
 
@@ -174,7 +192,7 @@ export default function useWindowResize({
 
             document.body.style.cursor = 'ns-resize';
             document.addEventListener('mousemove', handleMouseMoveBottomResize);
-            document.addEventListener('mouseup', handleMouseUp);
+            document.addEventListener('mouseup', handleMouseUpBottomResize);
         };
 
         // NOTE: LEFT
@@ -191,6 +209,16 @@ export default function useWindowResize({
             }
         };
 
+        const handleMouseUpLeftResize = () => {
+            document.body.style.cursor = 'default';
+            document.removeEventListener(
+                'mousemove',
+                handleMouseMoveLeftResize,
+            );
+            updateBounds();
+            document.removeEventListener('mouseup', handleMouseUpLeftResize);
+        };
+
         const handleMouseDownLeftResize = (event: MouseEvent) => {
             initialMouseX.current = event.clientX;
 
@@ -202,7 +230,7 @@ export default function useWindowResize({
 
             document.body.style.cursor = 'ew-resize';
             document.addEventListener('mousemove', handleMouseMoveLeftResize);
-            document.addEventListener('mouseup', handleMouseUp);
+            document.addEventListener('mouseup', handleMouseUpLeftResize);
         };
 
         // NOTE: LEFT TOP
@@ -229,6 +257,16 @@ export default function useWindowResize({
             }
         };
 
+        const handleMouseUpLeftTopResize = () => {
+            document.body.style.cursor = 'default';
+            document.removeEventListener(
+                'mousemove',
+                handleMouseMoveLeftTopResize,
+            );
+            updateBounds();
+            document.removeEventListener('mouseup', handleMouseUpLeftTopResize);
+        };
+
         const handleMouseDownLeftTopResize = (event: MouseEvent) => {
             initialMouseX.current = event.clientX;
             initialMouseY.current = event.clientY;
@@ -246,7 +284,7 @@ export default function useWindowResize({
                 'mousemove',
                 handleMouseMoveLeftTopResize,
             );
-            document.addEventListener('mouseup', handleMouseUp);
+            document.addEventListener('mouseup', handleMouseUpLeftTopResize);
         };
 
         // NOTE: RIGHT TOP
@@ -269,6 +307,19 @@ export default function useWindowResize({
             }
         };
 
+        const handleMouseUpRightTopResize = () => {
+            document.body.style.cursor = 'default';
+            document.removeEventListener(
+                'mousemove',
+                handleMouseMoveRightTopResize,
+            );
+            updateBounds();
+            document.removeEventListener(
+                'mouseup',
+                handleMouseUpRightTopResize,
+            );
+        };
+
         const handleMouseDownRightTopResize = (event: MouseEvent) => {
             initialMouseX.current = event.clientX;
             initialMouseY.current = event.clientY;
@@ -286,7 +337,7 @@ export default function useWindowResize({
                 'mousemove',
                 handleMouseMoveRightTopResize,
             );
-            document.addEventListener('mouseup', handleMouseUp);
+            document.addEventListener('mouseup', handleMouseUpRightTopResize);
         };
 
         // NOTE: RIGHT BOTTOM
@@ -305,6 +356,19 @@ export default function useWindowResize({
             }
         };
 
+        const handleMouseUpRightBottomResize = () => {
+            document.body.style.cursor = 'default';
+            document.removeEventListener(
+                'mousemove',
+                handleMouseMoveRightBottomResize,
+            );
+            updateBounds();
+            document.removeEventListener(
+                'mouseup',
+                handleMouseUpRightBottomResize,
+            );
+        };
+
         const handleMouseDownRightBottomResize = (event: MouseEvent) => {
             initialMouseX.current = event.clientX;
             initialMouseY.current = event.clientY;
@@ -318,7 +382,10 @@ export default function useWindowResize({
                 'mousemove',
                 handleMouseMoveRightBottomResize,
             );
-            document.addEventListener('mouseup', handleMouseUp);
+            document.addEventListener(
+                'mouseup',
+                handleMouseUpRightBottomResize,
+            );
         };
 
         // NOTE: LEFT BOTTOM
@@ -341,6 +408,19 @@ export default function useWindowResize({
             }
         };
 
+        const handleMouseUpLeftBottomResize = () => {
+            document.body.style.cursor = 'default';
+            document.removeEventListener(
+                'mousemove',
+                handleMouseMoveLeftBottomResize,
+            );
+            updateBounds();
+            document.removeEventListener(
+                'mouseup',
+                handleMouseUpLeftBottomResize,
+            );
+        };
+
         const handleMouseDownLeftBottomResize = (event: MouseEvent) => {
             initialMouseX.current = event.clientX;
             initialMouseY.current = event.clientY;
@@ -358,7 +438,7 @@ export default function useWindowResize({
                 'mousemove',
                 handleMouseMoveLeftBottomResize,
             );
-            document.addEventListener('mouseup', handleMouseUp);
+            document.addEventListener('mouseup', handleMouseUpLeftBottomResize);
         };
 
         const resizerRight = rightRef.current;
@@ -400,12 +480,12 @@ export default function useWindowResize({
             handleMouseDownLeftBottomResize,
         );
 
-        workspaceEl.addEventListener('mouseleave', handleMouseUp);
+        workspaceEl.addEventListener('mouseleave', handleCleanUp);
 
         return () => {
             handleCleanUp();
         };
-    }, [ref, onUpdatePosition, onUpdateSize, workspace]);
+    }, [workspace]);
 
     return {
         leftRef,
