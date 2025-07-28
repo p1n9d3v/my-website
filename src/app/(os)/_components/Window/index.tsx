@@ -36,7 +36,6 @@ export default function Window({
     const [syncSize, setSyncSize] = useState<Size>(size);
 
     const [isMaximized, setIsMaximized] = useState(false);
-    const [animation, setAnimation] = useState(false);
 
     const nodeRef = useRef<HTMLDivElement>(null);
 
@@ -66,13 +65,12 @@ export default function Window({
         const workspaceEl = document.querySelector('.workspace');
         if (!workspaceEl) return;
 
-        setAnimation(true);
         const workspaceBounds = workspaceEl.getBoundingClientRect();
 
         const nodeEl = nodeRef.current;
         if (!nodeEl) return;
 
-        nodeEl.style.transition = 'all 0.2s ease-in-out';
+        nodeEl.style.transition = 'all 0.2s linear';
 
         prevSizeRef.current = {
             width: syncSize.width,
@@ -101,7 +99,6 @@ export default function Window({
 
         nodeEl.style.transition = 'all 0.2s linear';
 
-        setAnimation(true);
         setSyncSize({
             width: prevSizeRef.current.width,
             height: prevSizeRef.current.height,

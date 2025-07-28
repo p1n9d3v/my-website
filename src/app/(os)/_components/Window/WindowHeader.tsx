@@ -54,10 +54,9 @@ export default function WindowHeader({
                         />
                     </button>
 
-                    {/*DESC: 숨김 버튼 */}
+                    {/*DESC: 숨김(최소화) 버튼 */}
                     <button
                         onClick={onHide}
-                        onMouseDown={(event) => event.stopPropagation()}
                         className={cn(
                             'h-3 w-3 rounded-full bg-yellow-500',
                             'transition-colors hover:bg-yellow-600',
@@ -72,10 +71,9 @@ export default function WindowHeader({
                         />
                     </button>
 
-                    {/*DESC: 최대화/최소화 버튼 */}
+                    {/*DESC: 최대화/복구 버튼 */}
                     <button
                         onClick={isMaximized ? onRestore : onMaximize}
-                        onMouseDown={(event) => event.stopPropagation()}
                         className={cn(
                             'h-3 w-3 rounded-full bg-green-500',
                             'transition-colors hover:bg-green-600',
