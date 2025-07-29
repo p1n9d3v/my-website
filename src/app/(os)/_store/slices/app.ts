@@ -1,13 +1,12 @@
 import { immer } from 'zustand/middleware/immer';
 
-import type { App, AppContext, Bounds } from '@/os/_types';
+import type { App, FileContext, Bounds } from '@/os/_types';
 
 import { APPS, MIN_HEIGHT, MIN_WIDTH } from '@/os/_constants';
 
 export interface AppStoreStates {
-    apps: Record<string, App>;
     runningAppIds: string[];
-    appContexts: Record<string, AppContext>;
+    appContexts: Record<string, FileContext>;
     activeAppId: string;
     activeCounter: number; //DESC: 앱 순서 정렬 용
 }
@@ -34,7 +33,6 @@ export interface AppStoreActions {
 export type AppSlice = AppStoreStates & AppStoreActions;
 
 export const useAppSlice = immer<AppSlice>((set) => ({
-    apps: APPS,
     appContexts: {},
     runningAppIds: [],
     activeAppId: '',
@@ -43,7 +41,7 @@ export const useAppSlice = immer<AppSlice>((set) => ({
         set((state) => {
             let context = state.appContexts[appId];
             if (!context) {
-                const { name } = state.apps[appId];
+                const { name } = APPS[appId];
 
                 const bounds = {
                     x: window.innerWidth / 2 - MIN_WIDTH / 2,

@@ -34,28 +34,34 @@ export interface Window {
 
 export interface App {
     id: string;
+    type: 'app';
     name: string;
     Icon: ComponentType<any>;
     Component: ComponentType<any>;
+    parentId: string | null;
 }
 
-export interface AppContext {
+export interface FileContext {
     id: string;
     name: string;
     window: Window;
 }
 
-export interface File {
+export interface TextFile {
     id: string;
+    type: 'text';
     name: string;
-    directoryId: string | null;
+    parentId: string | null;
+    content?: string;
+    size?: number;
 }
 
 export interface Directory {
     id: string;
+    type: 'directory';
     name: string;
-    entries: Record<string, Entry>;
-    directoryId: string | null;
+    parentId: string | null;
+    childrenIds: string[];
 }
 
-export type Entry = File | Directory;
+export type File = TextFile | Directory | App;
