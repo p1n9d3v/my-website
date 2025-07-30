@@ -16,7 +16,7 @@ export interface ProcessStoreActions {
         processId: string;
         windowId: string;
         program: Program;
-        file?: File;
+        file: File;
     }) => void;
     terminateProcess: (processId: string) => void;
 }

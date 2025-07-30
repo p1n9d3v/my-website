@@ -34,11 +34,12 @@ export default function Launcher({ file, ...rest }: LauncherProps) {
     const handleLaunchProcess = () => {
         const processId = nanoid();
         const windowId = nanoid();
+        //NOTE: Program일 경우 file === program
         launchProgram({
             processId,
             program,
             windowId,
-            file: program.type !== 'program' ? file : undefined,
+            file,
         });
         openWindow(windowId, processId);
     };

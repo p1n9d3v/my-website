@@ -19,7 +19,7 @@ export const FINDER: Program = {
     type: 'program',
     parentId: ROOT_ID,
     Icon: dynamic(() => import('lucide-react').then((mod) => mod.Folder)),
-    Component: dynamic(() => import('@/os/_apps/Finder')),
+    Component: dynamic(() => import('@/os/_programs/Finder')),
 };
 
 export const TEXT_VIEWER: Program = {
@@ -28,14 +28,14 @@ export const TEXT_VIEWER: Program = {
     type: 'program',
     parentId: ROOT_ID,
     Icon: dynamic(() => import('lucide-react').then((mod) => mod.FileText)),
-    Component: dynamic(() => import('@/os/_apps/TextViewer')),
+    Component: dynamic(() => import('@/os/_programs/TextViewer')),
 };
 
 export const BLOG: Directory = {
     name: 'blog',
     type: 'directory',
     id: BLOG_ID,
-    childrenIds: [],
+    childrenIds: [TEXT_VIEWER_ID],
     parentId: ROOT_ID,
 };
 

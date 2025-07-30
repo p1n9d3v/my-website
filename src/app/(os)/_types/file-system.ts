@@ -13,11 +13,11 @@ export interface Program extends BaseFile {
     Component: ComponentType<any>;
 }
 
-export interface Process {
+export interface Process<T = File> {
     id: string;
     program: Program;
     windowId: string;
-    file?: File;
+    file: T;
 }
 
 export interface TextFile extends BaseFile {

@@ -15,24 +15,20 @@ import { cn } from '@/utils/cn';
 import WindowHeader from './WindowHeader';
 
 interface WindowProps {
-    window: Window;
+    windowId: string;
     children: ReactNode;
+    title?: string;
     renderHeaderContent?: ReactNode;
 }
 
 export default function Window({
-    window: _window,
+    windowId,
+    title,
     children,
     renderHeaderContent,
 }: WindowProps) {
-    const {
-        bounds,
-        isHide,
-        zIndex,
-        isMaximized,
-        id: windowId,
-        processId,
-    } = _window;
+    const _window = useOSStore((state) => state.windows[windowId]);
+    const { bounds, isHide, zIndex, isMaximized, processId } = _window;
 
     const nodeRef = useRef<HTMLDivElement>(null);
 
@@ -184,7 +180,15 @@ export default function Window({
                 <WindowHeader
                     className="window-title-bar"
                     isMaximized={isMaximized}
-                    renderContent={renderHeaderContent}
+                    renderContent={
+                        renderHeaderContent ?? (
+                            <div className="absolute top-0 left-1/2 -translate-x-1/2 transform">
+                                <p className="text-xl text-green-500">
+                                    {title ?? '제목 없음'}
+                                </p>
+                            </div>
+                        )
+                    }
                     onClose={handleCloseWindow}
                     onMaximize={handleMaximizeWindow}
                     onRestore={handleRestoreWindow}
