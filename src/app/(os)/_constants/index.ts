@@ -1,33 +1,48 @@
 import { nanoid } from 'nanoid';
 import dynamic from 'next/dynamic';
 
-import type { App, Directory } from '@/os/_types';
+import type { Directory, Program } from '@/os/_types/file-system';
 
 //DESC: Window
-export const MIN_WIDTH = 300;
-export const MIN_HEIGHT = 300;
+export const MIN_WIDTH = 600;
+export const MIN_HEIGHT = 400;
 
-//DESC: Apps
+//DESC: Files
+export const ROOT_ID = nanoid();
 export const BLOG_ID = nanoid();
-export const DESKTOP_ID = nanoid();
+export const FINDER_ID = nanoid();
+export const TEXT_VIEWER_ID = nanoid();
 
-export const BLOG: App = {
-    name: 'Blog',
-    type: 'app',
-    id: BLOG_ID,
+export const FINDER: Program = {
+    id: FINDER_ID,
+    name: 'finder',
+    type: 'program',
+    parentId: ROOT_ID,
     Icon: dynamic(() => import('lucide-react').then((mod) => mod.Folder)),
-    Component: dynamic(() => import('@/os/_apps/Blog')),
-    parentId: DESKTOP_ID,
+    Component: dynamic(() => import('@/os/_apps/Finder')),
 };
 
-export const APPS: Record<string, App> = {
-    [BLOG_ID]: BLOG,
+export const TEXT_VIEWER: Program = {
+    id: TEXT_VIEWER_ID,
+    name: 'text-viewer',
+    type: 'program',
+    parentId: ROOT_ID,
+    Icon: dynamic(() => import('lucide-react').then((mod) => mod.FileText)),
+    Component: dynamic(() => import('@/os/_apps/TextViewer')),
 };
 
-export const DESKTOP_ETNRIES: Directory = {
-    name: 'Desktop',
+export const BLOG: Directory = {
+    name: 'blog',
     type: 'directory',
-    id: DESKTOP_ID,
+    id: BLOG_ID,
+    childrenIds: [],
+    parentId: ROOT_ID,
+};
+
+export const ROOT_DIRECTORY: Directory = {
+    name: 'root',
+    type: 'directory',
+    id: ROOT_ID,
     childrenIds: [BLOG_ID],
     parentId: null,
 };

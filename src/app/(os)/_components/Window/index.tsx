@@ -6,33 +6,32 @@ import type { DraggableData, DraggableEvent } from 'react-draggable';
 import { useCallback, useEffect, useRef } from 'react';
 import Draggable from 'react-draggable';
 
-import type { AppContext, Bounds } from '@/os/_types';
+import type { Bounds, Window } from '@/os/_types/window';
 
 import useWindowResize from '@/os/_hooks/useWindowResize';
+import { useOSStore } from '@/os/_store';
 import { cn } from '@/utils/cn';
 
-import { useOSStore } from '../../_store';
 import WindowHeader from './WindowHeader';
 
 interface WindowProps {
-    app: AppContext;
+    window: Window;
     children: ReactNode;
     renderHeaderContent?: ReactNode;
 }
 
 export default function Window({
-    app,
+    window: _window,
     children,
     renderHeaderContent,
 }: WindowProps) {
-    const { id: appId, window: _window } = app;
-    const { bounds, isHide, zIndex, isMaximized } = _window;
+    const { bounds, isHide, zIndex, isMaximized, id: windowId } = _window;
 
     const nodeRef = useRef<HTMLDivElement>(null);
 
     const {
         resizeWindow,
-        hideApp,
+        hideWindow,
         terminateApp,
         maximizeWindow,
         restoreWindow,
@@ -52,17 +51,17 @@ export default function Window({
         ref: nodeRef,
         workspace: '.workspace',
         onUpdateBounds: useCallback(
-            (bounds: Bounds) => resizeWindow(appId, bounds),
-            [appId, resizeWindow],
+            (bounds: Bounds) => resizeWindow(windowId, bounds),
+            [windowId, resizeWindow],
         ),
     });
 
     const handleHideWindow = () => {
-        hideApp(appId);
+        hideWindow(windowId);
     };
 
     const handleTerminateWindow = () => {
-        terminateApp(appId);
+        terminateApp(windowId);
     };
 
     const handleMaximizeWindow = useCallback(() => {
@@ -84,19 +83,19 @@ export default function Window({
         };
 
         maximizeWindow({
-            appId,
+            windowId,
             bounds: updatedBounds,
             prevBounds: {
                 ...bounds,
             },
         });
-    }, [appId, bounds, maximizeWindow]);
+    }, [windowId, bounds, maximizeWindow]);
 
     const handleRestoreWindow = () => {
         const nodeEl = nodeRef.current;
         if (!nodeEl) return;
 
-        restoreWindow(appId);
+        restoreWindow(windowId);
         nodeEl.style.transition = 'all 0.2s linear';
     };
 
@@ -106,7 +105,7 @@ export default function Window({
 
     const handleStopDrag = (_: DraggableEvent, data: DraggableData) => {
         document.body.style.cursor = 'default';
-        dragWindow(appId, {
+        dragWindow(windowId, {
             x: data.x,
             y: data.y,
         });
@@ -129,7 +128,7 @@ export default function Window({
                 };
 
                 maximizeWindow({
-                    appId,
+                    windowId,
                     bounds: updatedBounds,
                 });
             };
@@ -140,7 +139,7 @@ export default function Window({
                 window.removeEventListener('resize', handleMaximizeWindow);
             };
         }
-    }, [appId, isMaximized, maximizeWindow]);
+    }, [windowId, isMaximized, maximizeWindow]);
 
     return (
         <Draggable

@@ -12,28 +12,28 @@ import {
     User,
 } from 'lucide-react';
 
-import type { DockApp } from '@/os/_types';
+import type { App } from '@/os/_types/file-system';
 
 import { cn } from '@/utils/cn';
 
 import DockIcon from './DockIcon';
 
 export default function Dock() {
-    const dockApps: DockApp[] = [
-        { id: 'finder', icon: Folder, name: 'Finder', isRunning: false },
-        { id: 'about', icon: User, name: 'About Me', isRunning: false },
+    const dockApps: (App & any)[] = [
+        { id: 'finder', Icon: Folder, name: 'Finder', isRunning: false },
+        { id: 'about', Icon: User, name: 'About Me', isRunning: false },
         {
             id: 'portfolio',
-            icon: Briefcase,
+            Icon: Briefcase,
             name: 'Portfolio',
             isRunning: true,
         },
-        { id: 'blog', icon: FileText, name: 'Blog', isRunning: false },
-        { id: 'terminal', icon: Terminal, name: 'Terminal', isRunning: true },
-        { id: 'contact', icon: Mail, name: 'Contact', isRunning: false },
-        { id: 'music', icon: Music, name: 'Music', isRunning: false },
-        { id: 'settings', icon: Settings, name: 'Settings', isRunning: false },
-        { id: 'trash', icon: Trash2, name: 'Trash', isRunning: false },
+        { id: 'blog', Icon: FileText, name: 'Blog', isRunning: false },
+        { id: 'terminal', Icon: Terminal, name: 'Terminal', isRunning: true },
+        { id: 'contact', Icon: Mail, name: 'Contact', isRunning: false },
+        { id: 'music', Icon: Music, name: 'Music', isRunning: false },
+        { id: 'settings', Icon: Settings, name: 'Settings', isRunning: false },
+        { id: 'trash', Icon: Trash2, name: 'Trash', isRunning: false },
     ];
 
     return (
@@ -46,7 +46,11 @@ export default function Dock() {
         >
             <div className="flex items-end gap-2 px-4 py-3">
                 {dockApps.map((app) => (
-                    <DockIcon key={app.id} app={app} />
+                    <DockIcon
+                        key={app.id}
+                        app={app}
+                        isRunning={app.isRunning}
+                    />
                 ))}
             </div>
         </div>

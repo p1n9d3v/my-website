@@ -1,22 +1,23 @@
 import { useState } from 'react';
 
-import type { DockApp } from '@/os/_types';
+import type { App } from '@/os/_types/file-system';
 
 import { cn } from '@/utils/cn';
 
 interface DockIconProps {
-    app: DockApp;
+    app: App;
+    isRunning: boolean;
 }
 
-export default function DockIcon({ app }: DockIconProps) {
+export default function DockIcon({ app, isRunning }: DockIconProps) {
     const [isHovered, setIsHovered] = useState(false);
-    const IconComponent = app.icon;
+    const IconComponent = app.Icon;
 
-    const handleAppClick = (app: DockApp) => {
+    const handleAppClick = (app: App) => {
         console.log(`${app.name} 앱 실행/포커스`);
     };
 
-    const handleAppRightClick = (e: React.MouseEvent, app: DockApp) => {
+    const handleAppRightClick = (e: React.MouseEvent, app: App) => {
         e.preventDefault();
         console.log(`${app.name} 컨텍스트 메뉴`);
     };
@@ -55,7 +56,6 @@ export default function DockIcon({ app }: DockIconProps) {
                     'hover:-translate-y-2 hover:scale-110 hover:transform',
                     'active:scale-95',
                 )}
-                aria-label={`${app.name} ${app.isRunning ? '(실행 중)' : ''}`}
             >
                 <IconComponent
                     className={cn(
@@ -67,7 +67,7 @@ export default function DockIcon({ app }: DockIconProps) {
             </button>
 
             {/* 실행 중 표시 점 */}
-            {app.isRunning && (
+            {isRunning && (
                 <div
                     className={cn(
                         'absolute -bottom-1',

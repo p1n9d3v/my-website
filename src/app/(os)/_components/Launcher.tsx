@@ -1,34 +1,56 @@
-import type { ComponentType } from 'react';
-
-import { useRef, type ComponentProps } from 'react';
+import { nanoid } from 'nanoid';
+import { Suspense, useRef, type ComponentProps } from 'react';
 import Draggable from 'react-draggable';
 
 import { useOSStore } from '@/os/_store';
+import { type File } from '@/os/_types/file-system';
+
+import { FINDER_ID, TEXT_VIEWER_ID } from '../_constants';
 
 interface LauncherProps extends ComponentProps<'button'> {
-    Icon: ComponentType<any>;
-    name: string;
-    appId: string;
+    file: File;
 }
 
-export default function Launcher({
-    Icon,
-    name,
-    appId,
-    ...rest
-}: LauncherProps) {
+const getProgramId = (file: File) => {
+    switch (file.type) {
+        case 'program':
+            return file.id;
+        case 'text':
+            return TEXT_VIEWER_ID;
+        case 'directory':
+            return FINDER_ID;
+    }
+};
+
+export default function Launcher({ file, ...rest }: LauncherProps) {
     const nodeRef = useRef<HTMLButtonElement>(null);
-    const launchApp = useOSStore((state) => state.launchApp);
+    const launchProgram = useOSStore((state) => state.launchProgram);
+    const openWindow = useOSStore((state) => state.openWindow);
+    const getProgram = useOSStore((state) => state.getProgram);
+
+    const programId = getProgramId(file);
+    const program = getProgram(programId);
 
     const handleLaunchProcess = () => {
-        launchApp(appId);
+        const processId = nanoid();
+        const windowId = nanoid();
+        launchProgram({
+            processId,
+            program,
+            windowId,
+            file: program.type !== 'program' ? file : undefined,
+        });
+        openWindow(windowId, processId);
     };
 
     return (
         <Draggable nodeRef={nodeRef} bounds=".workspace">
             <button ref={nodeRef} onDoubleClick={handleLaunchProcess} {...rest}>
-                <Icon />
-                <p className="text-sm">{name}</p>
+                <Suspense fallback={null}>
+                    <program.Icon size={36} />
+                    <p className="text-sm">{file.name}</p>
+                </Suspense>
+                {/* <Icon size={36} /> */}
             </button>
         </Draggable>
     );

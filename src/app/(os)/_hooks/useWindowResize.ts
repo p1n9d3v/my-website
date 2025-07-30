@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, type RefObject } from 'react';
 
-import type { Bounds } from '../_types';
+import type { Bounds } from '@/os/_types/window';
 
 import { MIN_HEIGHT, MIN_WIDTH } from '../_constants';
 
