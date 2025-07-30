@@ -25,17 +25,25 @@ export default function Window({
     children,
     renderHeaderContent,
 }: WindowProps) {
-    const { bounds, isHide, zIndex, isMaximized, id: windowId } = _window;
+    const {
+        bounds,
+        isHide,
+        zIndex,
+        isMaximized,
+        id: windowId,
+        processId,
+    } = _window;
 
     const nodeRef = useRef<HTMLDivElement>(null);
 
     const {
         resizeWindow,
         hideWindow,
-        terminateApp,
+        closeWindow,
         maximizeWindow,
         restoreWindow,
         dragWindow,
+        terminateProcess,
     } = useOSStore();
 
     const {
@@ -60,8 +68,9 @@ export default function Window({
         hideWindow(windowId);
     };
 
-    const handleTerminateWindow = () => {
-        terminateApp(windowId);
+    const handleCloseWindow = () => {
+        closeWindow(windowId);
+        terminateProcess(processId);
     };
 
     const handleMaximizeWindow = useCallback(() => {
@@ -176,7 +185,7 @@ export default function Window({
                     className="window-title-bar"
                     isMaximized={isMaximized}
                     renderContent={renderHeaderContent}
-                    onClose={handleTerminateWindow}
+                    onClose={handleCloseWindow}
                     onMaximize={handleMaximizeWindow}
                     onRestore={handleRestoreWindow}
                     onHide={handleHideWindow}

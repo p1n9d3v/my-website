@@ -23,7 +23,7 @@ export default function Page() {
                 const App = process.program.Component;
                 return (
                     <Suspense key={process.id} fallback={null}>
-                        <App file={process} />
+                        <App process={process} />
                     </Suspense>
                 );
             })}

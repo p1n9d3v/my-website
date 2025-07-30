@@ -27,7 +27,6 @@ export interface WindowStoreActions {
     hideWindow: (windowId: string) => void;
     closeWindow: (windowId: string) => void;
     activateWindow: (windowId: string) => void;
-    getWindowByFileId: (processId: string) => Window;
 }
 
 export type WindowSlice = WindowStoreStates & WindowStoreActions;
@@ -36,16 +35,6 @@ export const useWindowSlice = immer<WindowSlice>((set, get) => ({
     windows: {},
     windowZIndex: 0,
     activeWindowId: '',
-    getWindowByFileId: (processId) => {
-        const windowsArr = Object.values(get().windows);
-        const window = windowsArr.find(
-            (window) => window.processId === processId,
-        );
-
-        if (!window) throw new Error('Window not found');
-
-        return window;
-    },
     activateWindow: (windowId) => {
         set((state) => {
             state.activeWindowId = windowId;
