@@ -22,7 +22,7 @@ export default function Layout({ children }: OSLayoutProps) {
         <OSStoreProvider initialNodes={{}}>
             <div className="relative h-screen w-screen overflow-hidden">
                 <MenuBar />
-                <div className="workspace relative top-10 h-[calc(100%-130px)] w-full">
+                <div className="workspace relative top-10 h-[calc(100%-124px)] w-full">
                     {children}
                 </div>
                 <Dock />

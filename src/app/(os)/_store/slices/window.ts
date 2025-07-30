@@ -25,6 +25,7 @@ export interface WindowStoreActions {
     }) => void;
     restoreWindow: (windowId: string) => void;
     hideWindow: (windowId: string) => void;
+    unhideWindow: (windowIds: string[]) => void;
     closeWindow: (windowId: string) => void;
     activateWindow: (windowId: string) => void;
 }
@@ -69,6 +70,13 @@ export const createWindowSlice = immer<WindowSlice>((set, get) => ({
     hideWindow: (windowId) => {
         set((state) => {
             state.windows[windowId].isHide = true;
+        });
+    },
+    unhideWindow: (windowIds) => {
+        set((state) => {
+            windowIds.forEach((windowId) => {
+                state.windows[windowId].isHide = false;
+            });
         });
     },
     dragWindow: (windowId, bounds) => {

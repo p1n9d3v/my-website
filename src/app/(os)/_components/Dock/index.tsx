@@ -1,5 +1,7 @@
 'use client';
 
+import { groupBy } from 'lodash';
+
 import { cn } from '@/utils/cn';
 
 import { FINDER, MARKDOWN_VIEWER } from '../../_constants';
@@ -7,12 +9,14 @@ import { useOSContext } from '../../_store/provider';
 import DockIcon from './DockIcon';
 
 export default function Dock() {
-    const processes = useOSContext((state) => state.processes);
+    const _processes = useOSContext((state) => state.processes);
+    const unhideWindow = useOSContext((state) => state.unhideWindow);
 
     //TODO: Finder, Terminal is default programs
     const defaultPrograms = [FINDER, MARKDOWN_VIEWER];
 
-    const processesList = Object.values(processes);
+    const runningPrograms = groupBy(Object.values(_processes), 'program.id');
+
     return (
         <div
             className={cn(
@@ -21,23 +25,31 @@ export default function Dock() {
                 'rounded-2xl shadow-lg shadow-black/20',
             )}
         >
-            <div className="flex gap-2 px-4 py-3">
+            <div className="flex gap-2 px-4 py-2">
                 {defaultPrograms.map((program) => (
                     <DockIcon key={program.id} program={program} />
                 ))}
 
                 {/*DESC: Divider */}
-                {processesList.length > 0 && (
+                {Object.keys(runningPrograms).length > 0 && (
                     <div className="w-0.5 flex-1 bg-white" />
                 )}
 
-                {processesList.map((process) => (
-                    <DockIcon
-                        key={process.id}
-                        program={process.program}
-                        isRunning
-                    />
-                ))}
+                {Object.keys(runningPrograms).map((processId) => {
+                    const processes = runningPrograms[processId];
+                    const process = processes[0];
+                    const windowIds = processes.map(
+                        (process) => process.windowId,
+                    );
+                    return (
+                        <DockIcon
+                            key={process.id}
+                            program={process.program}
+                            processCount={runningPrograms[processId].length}
+                            onClick={() => unhideWindow(windowIds)}
+                        />
+                    );
+                })}
             </div>
         </div>
     );

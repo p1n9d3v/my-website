@@ -6,16 +6,16 @@ import { cn } from '@/utils/cn';
 
 interface DockIconProps {
     program: Program;
-    isRunning?: boolean;
+    processCount?: number;
+    onClick?: () => void;
 }
 
-export default function DockIcon({ program, isRunning }: DockIconProps) {
+export default function DockIcon({
+    program,
+    processCount,
+    onClick,
+}: DockIconProps) {
     const [isHovered, setIsHovered] = useState(false);
-    const IconComponent = program.Icon;
-
-    const handleAppClick = (program: Program) => {
-        console.log(`${program.name} 앱 실행/포커스`);
-    };
 
     const handleAppRightClick = (e: React.MouseEvent, program: Program) => {
         e.preventDefault();
@@ -24,7 +24,13 @@ export default function DockIcon({ program, isRunning }: DockIconProps) {
 
     return (
         <div
-            className="relative flex flex-col items-center"
+            className={cn(
+                'group',
+                'relative flex flex-col items-center',
+                'rounded-xl transition-all duration-300 ease-out',
+                'cursor-pointer hover:bg-white/90',
+                'hover:-translate-y-4 hover:scale-110 hover:transform',
+            )}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
@@ -32,9 +38,9 @@ export default function DockIcon({ program, isRunning }: DockIconProps) {
             {isHovered && (
                 <div
                     className={cn(
-                        'absolute -top-10 left-1/2 -translate-x-1/2 transform',
-                        'bg-white/40 backdrop-blur-sm',
-                        'text-xs font-medium text-white',
+                        'absolute -top-8 left-1/2 -translate-x-1/2 transform',
+                        'bg-white backdrop-blur-sm',
+                        'text-xs font-medium text-black',
                         'rounded-md px-2 py-1',
                         'whitespace-nowrap',
                     )}
@@ -45,36 +51,31 @@ export default function DockIcon({ program, isRunning }: DockIconProps) {
 
             {/* 앱 버튼 */}
             <button
-                onClick={() => handleAppClick(program)}
+                onClick={onClick}
                 onContextMenu={(e) => handleAppRightClick(e, program)}
-                className={cn(
-                    'group',
-                    'h-14 w-14',
-                    'flex items-center justify-center',
-                    'rounded-xl transition-all duration-300 ease-out',
-                    'cursor-pointer hover:bg-white/90',
-                    'hover:-translate-y-2 hover:scale-110 hover:transform',
-                    'active:scale-95',
-                )}
+                className={cn('h-14 w-14', 'flex items-center justify-center')}
             >
-                <IconComponent
-                    className={cn(
-                        'h-8 w-8',
-                        'text-white drop-shadow-sm transition-all duration-300',
-                        'group-hover:text-black/80',
-                    )}
+                <program.Icon
+                    size={38}
+                    className={cn('text-white', 'group-hover:text-black/80')}
                 />
             </button>
 
-            {/* 실행 중 표시 점 */}
-            {isRunning && (
-                <div
-                    className={cn(
-                        'absolute -bottom-1',
-                        'h-1 w-1',
-                        'rounded-full bg-white/80',
-                    )}
-                />
+            {processCount && (
+                <div className="absolute bottom-0.5 flex gap-1">
+                    {Array.from({
+                        length: processCount > 5 ? 5 : processCount,
+                    }).map((_, i) => (
+                        <div
+                            key={i}
+                            className={cn(
+                                'h-1 w-1',
+                                'rounded-full bg-white/60',
+                                'group-hover:-translate-y-1 group-hover:bg-black/60',
+                            )}
+                        />
+                    ))}
+                </div>
             )}
         </div>
     );
