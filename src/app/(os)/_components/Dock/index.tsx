@@ -12,14 +12,14 @@ import {
     User,
 } from 'lucide-react';
 
-import type { App } from '@/os/_types/file-system';
+import type { Program } from '@/os/_types/file-system';
 
 import { cn } from '@/utils/cn';
 
 import DockIcon from './DockIcon';
 
 export default function Dock() {
-    const dockApps: (App & any)[] = [
+    const dockApps: (Program & any)[] = [
         { id: 'finder', Icon: Folder, name: 'Finder', isRunning: false },
         { id: 'about', Icon: User, name: 'About Me', isRunning: false },
         {

@@ -1,11 +1,11 @@
 import { useState } from 'react';
 
-import type { App } from '@/os/_types/file-system';
+import type { Program } from '@/os/_types/file-system';
 
 import { cn } from '@/utils/cn';
 
 interface DockIconProps {
-    app: App;
+    app: Program;
     isRunning: boolean;
 }
 
@@ -13,11 +13,11 @@ export default function DockIcon({ app, isRunning }: DockIconProps) {
     const [isHovered, setIsHovered] = useState(false);
     const IconComponent = app.Icon;
 
-    const handleAppClick = (app: App) => {
+    const handleAppClick = (app: Program) => {
         console.log(`${app.name} 앱 실행/포커스`);
     };
 
-    const handleAppRightClick = (e: React.MouseEvent, app: App) => {
+    const handleAppRightClick = (e: React.MouseEvent, app: Program) => {
         e.preventDefault();
         console.log(`${app.name} 컨텍스트 메뉴`);
     };

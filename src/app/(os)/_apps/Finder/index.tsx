@@ -16,13 +16,11 @@ export default function Finder({ process }: FinderProps) {
             window={window}
             renderHeaderContent={
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 transform">
-                    <p className="text-xl dark:text-green-500">
-                        {program.name}
-                    </p>
+                    <p className="text-xl text-green-500">{program.name}</p>
                 </div>
             }
         >
-            <p className="text-xl dark:text-green-500">Funcking</p>
+            <p className="text-xl text-green-500">Funcking</p>
         </Window>
     );
 }
