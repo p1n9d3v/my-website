@@ -9,7 +9,6 @@ import {
     FINDER_ID,
     ROOT_DIRECTORY,
     ROOT_ID,
-    TEXT_VIEWER,
     TEXT_VIEWER_ID,
 } from '@/os/_constants';
 import {
@@ -27,7 +26,6 @@ export interface FileSystemStoreActions {
     getDirectory: (directoryId: string) => Directory;
     getProgram: (programId: string) => Program;
     getFile: (fileId: string) => File;
-    getFiles: (fileIds: string[]) => File[];
 }
 
 export type FileSystemSlice = FileSystemStoreStates & FileSystemStoreActions;
@@ -43,9 +41,6 @@ export const useFileSystemSlice = immer<FileSystemSlice>((set, get) => ({
         const file = get().nodes[fileId];
 
         return file;
-    },
-    getFiles: (fileIds) => {
-        return fileIds.map((fileId) => get().getFile(fileId));
     },
     getProgram: (programId) => {
         const program = get().nodes[programId];
