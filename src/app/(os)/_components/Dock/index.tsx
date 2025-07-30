@@ -1,41 +1,18 @@
 'use client';
 
-import {
-    Briefcase,
-    FileText,
-    Folder,
-    Mail,
-    Music,
-    Settings,
-    Terminal,
-    Trash2,
-    User,
-} from 'lucide-react';
-
-import type { Program } from '@/os/_types/file-system';
-
 import { cn } from '@/utils/cn';
 
+import { FINDER, MARKDOWN_VIEWER } from '../../_constants';
+import { useOSContext } from '../../_store/provider';
 import DockIcon from './DockIcon';
 
 export default function Dock() {
-    const dockApps: (Program & any)[] = [
-        { id: 'finder', Icon: Folder, name: 'Finder', isRunning: false },
-        { id: 'about', Icon: User, name: 'About Me', isRunning: false },
-        {
-            id: 'portfolio',
-            Icon: Briefcase,
-            name: 'Portfolio',
-            isRunning: true,
-        },
-        { id: 'blog', Icon: FileText, name: 'Blog', isRunning: false },
-        { id: 'terminal', Icon: Terminal, name: 'Terminal', isRunning: true },
-        { id: 'contact', Icon: Mail, name: 'Contact', isRunning: false },
-        { id: 'music', Icon: Music, name: 'Music', isRunning: false },
-        { id: 'settings', Icon: Settings, name: 'Settings', isRunning: false },
-        { id: 'trash', Icon: Trash2, name: 'Trash', isRunning: false },
-    ];
+    const processes = useOSContext((state) => state.processes);
 
+    //TODO: Finder, Terminal is default programs
+    const defaultPrograms = [FINDER, MARKDOWN_VIEWER];
+
+    const processesList = Object.values(processes);
     return (
         <div
             className={cn(
@@ -44,12 +21,21 @@ export default function Dock() {
                 'rounded-2xl shadow-lg shadow-black/20',
             )}
         >
-            <div className="flex items-end gap-2 px-4 py-3">
-                {dockApps.map((app) => (
+            <div className="flex gap-2 px-4 py-3">
+                {defaultPrograms.map((program) => (
+                    <DockIcon key={program.id} program={program} />
+                ))}
+
+                {/*DESC: Divider */}
+                {processesList.length > 0 && (
+                    <div className="w-0.5 flex-1 bg-white" />
+                )}
+
+                {processesList.map((process) => (
                     <DockIcon
-                        key={app.id}
-                        app={app}
-                        isRunning={app.isRunning}
+                        key={process.id}
+                        program={process.program}
+                        isRunning
                     />
                 ))}
             </div>

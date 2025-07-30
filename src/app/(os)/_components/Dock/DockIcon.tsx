@@ -5,21 +5,21 @@ import type { Program } from '@/os/_types/file-system';
 import { cn } from '@/utils/cn';
 
 interface DockIconProps {
-    app: Program;
-    isRunning: boolean;
+    program: Program;
+    isRunning?: boolean;
 }
 
-export default function DockIcon({ app, isRunning }: DockIconProps) {
+export default function DockIcon({ program, isRunning }: DockIconProps) {
     const [isHovered, setIsHovered] = useState(false);
-    const IconComponent = app.Icon;
+    const IconComponent = program.Icon;
 
-    const handleAppClick = (app: Program) => {
-        console.log(`${app.name} 앱 실행/포커스`);
+    const handleAppClick = (program: Program) => {
+        console.log(`${program.name} 앱 실행/포커스`);
     };
 
-    const handleAppRightClick = (e: React.MouseEvent, app: Program) => {
+    const handleAppRightClick = (e: React.MouseEvent, program: Program) => {
         e.preventDefault();
-        console.log(`${app.name} 컨텍스트 메뉴`);
+        console.log(`${program.name} 컨텍스트 메뉴`);
     };
 
     return (
@@ -39,14 +39,14 @@ export default function DockIcon({ app, isRunning }: DockIconProps) {
                         'whitespace-nowrap',
                     )}
                 >
-                    {app.name}
+                    {program.name}
                 </div>
             )}
 
             {/* 앱 버튼 */}
             <button
-                onClick={() => handleAppClick(app)}
-                onContextMenu={(e) => handleAppRightClick(e, app)}
+                onClick={() => handleAppClick(program)}
+                onContextMenu={(e) => handleAppRightClick(e, program)}
                 className={cn(
                     'group',
                     'h-14 w-14',
