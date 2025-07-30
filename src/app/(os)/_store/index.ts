@@ -1,23 +1,31 @@
-import { create } from 'zustand';
+import { createStore } from 'zustand';
 import { devtools } from 'zustand/middleware';
 
+import type { File } from '../_types/file-system';
 import type { WindowSlice } from './slices/window';
 
-import { useFileSystemSlice, type FileSystemSlice } from './slices/file-system';
-import { useAppSlice, type ProcessSlice } from './slices/process';
-import { useWindowSlice } from './slices/window';
+import {
+    createFileSystemSlice,
+    type FileSystemSlice,
+} from './slices/file-system';
+import { createProcessSlice, type ProcessSlice } from './slices/process';
+import { createWindowSlice } from './slices/window';
 
-type CombinedState = ProcessSlice & WindowSlice & FileSystemSlice;
+export type OSStoreState = ProcessSlice & WindowSlice & FileSystemSlice;
 
-export const useOSStore = create<CombinedState>()(
-    devtools(
-        (...a) => ({
-            ...useAppSlice(...a),
-            ...useWindowSlice(...a),
-            ...useFileSystemSlice(...a),
-        }),
-        {
-            name: 'OSStore',
-        },
-    ),
-);
+export const createOSStore = (initialNodes: Record<string, File>) => {
+    return createStore<OSStoreState>()(
+        devtools(
+            (...a) => ({
+                ...createProcessSlice(...a),
+                ...createWindowSlice(...a),
+                ...createFileSystemSlice(initialNodes)(...a),
+            }),
+            {
+                name: 'OSStore',
+            },
+        ),
+    );
+};
+
+export type OSStore = ReturnType<typeof createOSStore>;

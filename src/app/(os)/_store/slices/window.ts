@@ -31,7 +31,7 @@ export interface WindowStoreActions {
 
 export type WindowSlice = WindowStoreStates & WindowStoreActions;
 
-export const useWindowSlice = immer<WindowSlice>((set, get) => ({
+export const createWindowSlice = immer<WindowSlice>((set, get) => ({
     windows: {},
     windowZIndex: 0,
     activeWindowId: '',

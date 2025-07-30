@@ -5,12 +5,13 @@ import { Suspense } from 'react';
 import Launcher from '@/os/_components/Launcher';
 
 import { ROOT_ID } from './_constants';
-import { useOSStore } from './_store';
+import { useOSContext } from './_store/provider';
 
 export default function Page() {
-    const { getFile, getDirectory } = useOSStore();
+    const getDirectory = useOSContext((state) => state.getDirectory);
+    const getFile = useOSContext((state) => state.getFile);
     const rootDirectory = getDirectory(ROOT_ID);
-    const processes = useOSStore((state) => state.processes);
+    const processes = useOSContext((state) => state.processes);
 
     const files = rootDirectory.childrenIds.map((childId) => getFile(childId));
 

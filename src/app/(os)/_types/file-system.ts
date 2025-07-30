@@ -2,7 +2,7 @@ import type { ComponentType } from 'react';
 
 export interface BaseFile {
     id: string;
-    type: 'text' | 'directory' | 'program';
+    type: 'markdown' | 'directory' | 'program';
     name: string;
     parentId: string | null;
 }
@@ -20,9 +20,9 @@ export interface Process<T = File> {
     file: T;
 }
 
-export interface TextFile extends BaseFile {
-    type: 'text';
-    content: string;
+export interface Markdown extends BaseFile {
+    type: 'markdown';
+    Component: ComponentType<any>;
 }
 
 export interface Directory extends BaseFile {
@@ -30,7 +30,7 @@ export interface Directory extends BaseFile {
     childrenIds: string[];
 }
 
-export type File = TextFile | Directory | Program;
+export type File = Markdown | Directory | Program;
 
 export const isDirectory = (file: File): file is Directory =>
     file.type === 'directory';
@@ -38,5 +38,5 @@ export const isDirectory = (file: File): file is Directory =>
 export const isProgram = (file: File): file is Program =>
     file.type === 'program';
 
-export const isTextFile = (file: File): file is TextFile =>
-    file.type === 'text';
+export const isMarkdown = (file: File): file is Markdown =>
+    file.type === 'markdown';

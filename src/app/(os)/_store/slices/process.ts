@@ -23,7 +23,7 @@ export interface ProcessStoreActions {
 
 export type ProcessSlice = ProcessStoreStates & ProcessStoreActions;
 
-export const useAppSlice = immer<ProcessSlice>((set) => ({
+export const createProcessSlice = immer<ProcessSlice>((set) => ({
     processes: {},
     launchProgram: ({ processId, program, windowId, file }) => {
         set((state) => {

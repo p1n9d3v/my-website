@@ -9,7 +9,7 @@ import Draggable from 'react-draggable';
 import type { Bounds, Window } from '@/os/_types/window';
 
 import useWindowResize from '@/os/_hooks/useWindowResize';
-import { useOSStore } from '@/os/_store';
+import { useOSContext } from '@/os/_store/provider';
 import { cn } from '@/utils/cn';
 
 import WindowHeader from './WindowHeader';
@@ -27,20 +27,18 @@ export default function Window({
     children,
     renderHeaderContent,
 }: WindowProps) {
-    const _window = useOSStore((state) => state.windows[windowId]);
+    const _window = useOSContext((state) => state.windows[windowId]);
     const { bounds, isHide, zIndex, isMaximized, processId } = _window;
 
     const nodeRef = useRef<HTMLDivElement>(null);
 
-    const {
-        resizeWindow,
-        hideWindow,
-        closeWindow,
-        maximizeWindow,
-        restoreWindow,
-        dragWindow,
-        terminateProcess,
-    } = useOSStore();
+    const resizeWindow = useOSContext((state) => state.resizeWindow);
+    const hideWindow = useOSContext((state) => state.hideWindow);
+    const closeWindow = useOSContext((state) => state.closeWindow);
+    const maximizeWindow = useOSContext((state) => state.maximizeWindow);
+    const restoreWindow = useOSContext((state) => state.restoreWindow);
+    const dragWindow = useOSContext((state) => state.dragWindow);
+    const terminateProcess = useOSContext((state) => state.terminateProcess);
 
     const {
         leftRef,

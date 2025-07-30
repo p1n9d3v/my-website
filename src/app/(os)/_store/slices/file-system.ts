@@ -3,20 +3,13 @@ import { immer } from 'zustand/middleware/immer';
 import type { Program } from '@/os/_types/file-system';
 
 import {
-    BLOG,
-    BLOG_ID,
-    FINDER,
-    FINDER_ID,
-    ROOT_DIRECTORY,
-    ROOT_ID,
-    TEXT_VIEWER_ID,
-} from '@/os/_constants';
-import {
     type Directory,
     type File,
     isDirectory,
     isProgram,
 } from '@/os/_types/file-system';
+
+import { INITIAL_NODES } from '../../_constants';
 
 export interface FileSystemStoreStates {
     nodes: Record<string, File>;
@@ -26,38 +19,40 @@ export interface FileSystemStoreActions {
     getDirectory: (directoryId: string) => Directory;
     getProgram: (programId: string) => Program;
     getFile: (fileId: string) => File;
+    getFiles: (fileIds: string[]) => File[];
 }
 
 export type FileSystemSlice = FileSystemStoreStates & FileSystemStoreActions;
 
-export const useFileSystemSlice = immer<FileSystemSlice>((set, get) => ({
-    nodes: {
-        [ROOT_ID]: ROOT_DIRECTORY,
-        [BLOG_ID]: BLOG,
-        [FINDER_ID]: FINDER,
-        [TEXT_VIEWER_ID]: TEXT_VIEWER,
-    },
-    getFile: (fileId) => {
-        const file = get().nodes[fileId];
+export const createFileSystemSlice = (initialNodes: Record<string, File>) =>
+    immer<FileSystemSlice>((set, get) => ({
+        nodes: {
+            ...INITIAL_NODES,
+        },
+        getFile: (fileId) => {
+            const file = get().nodes[fileId];
 
-        return file;
-    },
-    getProgram: (programId) => {
-        const program = get().nodes[programId];
+            return file;
+        },
+        getFiles: (fileIds) => {
+            return fileIds.map((fileId) => get().getFile(fileId));
+        },
+        getProgram: (programId) => {
+            const program = get().nodes[programId];
 
-        if (!isProgram(program)) {
-            throw new Error('The program is not found');
-        }
+            if (!isProgram(program)) {
+                throw new Error('The program is not found');
+            }
 
-        return program;
-    },
-    getDirectory: (directoryId) => {
-        const directory = get().nodes[directoryId];
+            return program;
+        },
+        getDirectory: (directoryId) => {
+            const directory = get().nodes[directoryId];
 
-        if (!isDirectory(directory)) {
-            throw new Error('The directory is not found');
-        }
+            if (!isDirectory(directory)) {
+                throw new Error('The directory is not found');
+            }
 
-        return directory;
-    },
-}));
+            return directory;
+        },
+    }));

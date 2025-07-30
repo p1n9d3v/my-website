@@ -1,11 +1,13 @@
+'use client';
+
 import { nanoid } from 'nanoid';
 import { Suspense, useRef, type ComponentProps } from 'react';
 import Draggable from 'react-draggable';
 
-import { useOSStore } from '@/os/_store';
 import { type File } from '@/os/_types/file-system';
 
-import { FINDER_ID, TEXT_VIEWER_ID } from '../_constants';
+import { FINDER_ID, MARKDOWN_VIEWER_ID } from '../_constants';
+import { useOSContext } from '../_store/provider';
 
 interface LauncherProps extends ComponentProps<'button'> {
     file: File;
@@ -15,8 +17,8 @@ const getProgramId = (file: File) => {
     switch (file.type) {
         case 'program':
             return file.id;
-        case 'text':
-            return TEXT_VIEWER_ID;
+        case 'markdown':
+            return MARKDOWN_VIEWER_ID;
         case 'directory':
             return FINDER_ID;
     }
@@ -24,9 +26,9 @@ const getProgramId = (file: File) => {
 
 export default function Launcher({ file, ...rest }: LauncherProps) {
     const nodeRef = useRef<HTMLButtonElement>(null);
-    const launchProgram = useOSStore((state) => state.launchProgram);
-    const openWindow = useOSStore((state) => state.openWindow);
-    const getProgram = useOSStore((state) => state.getProgram);
+    const launchProgram = useOSContext((state) => state.launchProgram);
+    const openWindow = useOSContext((state) => state.openWindow);
+    const getProgram = useOSContext((state) => state.getProgram);
 
     const programId = getProgramId(file);
     const program = getProgram(programId);
