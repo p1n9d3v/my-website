@@ -23,7 +23,7 @@ export default function DockIcon({
     };
 
     return (
-        <div
+        <button
             className={cn(
                 'group',
                 'relative flex flex-col items-center',
@@ -33,8 +33,8 @@ export default function DockIcon({
             )}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
+            onClick={onClick}
         >
-            {/* 툴팁 라벨 */}
             {isHovered && (
                 <div
                     className={cn(
@@ -49,9 +49,7 @@ export default function DockIcon({
                 </div>
             )}
 
-            {/* 앱 버튼 */}
-            <button
-                onClick={onClick}
+            <div
                 onContextMenu={(e) => handleAppRightClick(e, program)}
                 className={cn('h-14 w-14', 'flex items-center justify-center')}
             >
@@ -59,7 +57,7 @@ export default function DockIcon({
                     size={38}
                     className={cn('text-white', 'group-hover:text-black/80')}
                 />
-            </button>
+            </div>
 
             {processCount && (
                 <div className="absolute bottom-0.5 flex gap-1">
@@ -77,6 +75,6 @@ export default function DockIcon({
                     ))}
                 </div>
             )}
-        </div>
+        </button>
     );
 }

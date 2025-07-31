@@ -32,6 +32,9 @@ export default function WindowHeader({
                 'border-b border-white/10',
                 className,
             )}
+            onTransitionEnd={(event) => {
+                event.stopPropagation();
+            }}
         >
             {/*DESC: 왼쪽: 컨트롤 버튼 */}
             <div className="cursor-default">

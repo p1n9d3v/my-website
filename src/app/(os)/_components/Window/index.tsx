@@ -1,12 +1,13 @@
 'use client';
-
 import type { ReactNode } from 'react';
 import type { DraggableData, DraggableEvent } from 'react-draggable';
 
+import { useGSAP } from '@gsap/react';
+import gsap from 'gsap';
 import { useCallback, useEffect, useRef } from 'react';
 import Draggable from 'react-draggable';
 
-import type { Bounds, Window } from '@/os/_types/window';
+import type { Bounds } from '@/os/_types/window';
 
 import useWindowResize from '@/os/_hooks/useWindowResize';
 import { useOSContext } from '@/os/_store/provider';
@@ -18,19 +19,23 @@ interface WindowProps {
     windowId: string;
     children: ReactNode;
     title?: string;
+    contentClassName?: string;
     renderHeaderContent?: ReactNode;
 }
 
+gsap.registerPlugin(useGSAP);
 export default function Window({
     windowId,
     title,
     children,
+    contentClassName,
     renderHeaderContent,
 }: WindowProps) {
     const _window = useOSContext((state) => state.windows[windowId]);
     const { bounds, isHide, zIndex, isMaximized, processId } = _window;
 
     const nodeRef = useRef<HTMLDivElement>(null);
+    const boundsRef = useRef<Bounds>(bounds);
 
     const resizeWindow = useOSContext((state) => state.resizeWindow);
     const hideWindow = useOSContext((state) => state.hideWindow);
@@ -53,7 +58,9 @@ export default function Window({
         ref: nodeRef,
         workspace: '.workspace',
         onUpdateBounds: useCallback(
-            (bounds: Bounds) => resizeWindow(windowId, bounds),
+            (bounds: Bounds) => {
+                resizeWindow(windowId, bounds);
+            },
             [windowId, resizeWindow],
         ),
     });
@@ -112,6 +119,11 @@ export default function Window({
             x: data.x,
             y: data.y,
         });
+        boundsRef.current = {
+            ...boundsRef.current,
+            x: data.x,
+            y: data.y,
+        };
     };
 
     //DESC: Browser Window Resize 처리
@@ -138,11 +150,52 @@ export default function Window({
             window.addEventListener('resize', handleMaximizeWindow);
 
             return () => {
-                console.log('unmount');
                 window.removeEventListener('resize', handleMaximizeWindow);
             };
         }
     }, [windowId, isMaximized, maximizeWindow]);
+
+    useGSAP(
+        () => {
+            console.log(boundsRef.current.x);
+            if (isHide) {
+                gsap.fromTo(
+                    nodeRef.current,
+                    {
+                        x: boundsRef.current.x,
+                        y: boundsRef.current.y,
+                        autoAlpha: 1,
+                    },
+                    {
+                        x: boundsRef.current.x,
+                        y: boundsRef.current.y + 100,
+                        autoAlpha: 0,
+                        duration: 0.3,
+                        ease: 'power2.out',
+                    },
+                );
+            } else {
+                gsap.fromTo(
+                    nodeRef.current,
+                    {
+                        x: boundsRef.current.x,
+                        y: boundsRef.current.y + 100,
+                        autoAlpha: 0,
+                    },
+                    {
+                        x: boundsRef.current.x,
+                        y: boundsRef.current.y,
+                        autoAlpha: 1,
+                        duration: 0.3,
+                        ease: 'power2.out',
+                    },
+                );
+            }
+        },
+        {
+            dependencies: [isHide],
+        },
+    );
 
     return (
         <Draggable
@@ -151,7 +204,10 @@ export default function Window({
             bounds=".workspace"
             disabled={isMaximized}
             position={bounds}
-            defaultClassName={cn('left-0 top-0', isHide && 'invisible')}
+            defaultClassName={cn(
+                'left-0 top-0',
+                'transition-opacity duration-300 ease-out',
+            )}
             onStart={handleStartDrag}
             onStop={handleStopDrag}
         >
@@ -161,7 +217,6 @@ export default function Window({
                     'absolute',
                     'bg-black/30 backdrop-blur-sm',
                     'rounded-lg border border-white/20 shadow-2xl',
-                    'overflow-hidden',
                 )}
                 style={{
                     width: bounds.width,
@@ -194,7 +249,15 @@ export default function Window({
                 />
 
                 {/*DESC: 컨텐츠 영역 */}
-                <div className="h-[calc(100%-2rem)]">{children}</div>
+                <div
+                    className={cn(
+                        'relative',
+                        'h-[calc(100%-32px)]',
+                        contentClassName ?? '',
+                    )}
+                >
+                    {children}
+                </div>
 
                 {/*DESC: Resizer */}
                 <div

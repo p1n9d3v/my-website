@@ -16,6 +16,7 @@ export default function Finder({ process }: FinderProps) {
 
     return (
         <Window
+            contentClassName="finder-window"
             windowId={windowId}
             renderHeaderContent={
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 transform">
@@ -24,7 +25,7 @@ export default function Finder({ process }: FinderProps) {
             }
         >
             {files.map((file) => (
-                <Launcher key={file.id} file={file} />
+                <Launcher key={file.id} file={file} bounds=".finder-window" />
             ))}
         </Window>
     );

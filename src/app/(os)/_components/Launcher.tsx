@@ -10,6 +10,7 @@ import { FINDER_ID, MARKDOWN_VIEWER_ID } from '../_constants';
 import { useOSContext } from '../_store/provider';
 
 interface LauncherProps extends ComponentProps<'button'> {
+    bounds: string;
     file: File;
 }
 
@@ -24,7 +25,7 @@ const getProgramId = (file: File) => {
     }
 };
 
-export default function Launcher({ file, ...rest }: LauncherProps) {
+export default function Launcher({ file, bounds, ...rest }: LauncherProps) {
     const nodeRef = useRef<HTMLButtonElement>(null);
     const launchProgram = useOSContext((state) => state.launchProgram);
     const openWindow = useOSContext((state) => state.openWindow);
@@ -47,13 +48,17 @@ export default function Launcher({ file, ...rest }: LauncherProps) {
     };
 
     return (
-        <Draggable nodeRef={nodeRef} bounds=".workspace">
-            <button ref={nodeRef} onDoubleClick={handleLaunchProcess} {...rest}>
+        <Draggable nodeRef={nodeRef} bounds={bounds}>
+            <button
+                ref={nodeRef}
+                onDoubleClick={handleLaunchProcess}
+                className="flex flex-col items-center"
+                {...rest}
+            >
                 <Suspense fallback={null}>
                     <program.Icon size={36} />
                     <p className="text-sm">{file.name}</p>
                 </Suspense>
-                {/* <Icon size={36} /> */}
             </button>
         </Draggable>
     );

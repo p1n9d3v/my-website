@@ -18,7 +18,7 @@ export default function Page() {
     return (
         <>
             {files.map((file) => (
-                <Launcher key={file.id} file={file} />
+                <Launcher key={file.id} file={file} bounds=".workspace" />
             ))}
             {Object.values(processes).map((process) => {
                 const App = process.program.Component;
