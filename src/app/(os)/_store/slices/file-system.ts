@@ -9,7 +9,13 @@ import {
     isProgram,
 } from '@/os/_types/file-system';
 
-import { INITIAL_NODES } from '../../_constants';
+import {
+    FINDER,
+    FINDER_ID,
+    INITIAL_NODES,
+    MARKDOWN_VIEWER,
+    MARKDOWN_VIEWER_ID,
+} from '../../_constants';
 
 export interface FileSystemStoreStates {
     nodes: Record<string, File>;
@@ -27,7 +33,9 @@ export type FileSystemSlice = FileSystemStoreStates & FileSystemStoreActions;
 export const createFileSystemSlice = (initialNodes: Record<string, File>) =>
     immer<FileSystemSlice>((set, get) => ({
         nodes: {
-            ...INITIAL_NODES,
+            ...initialNodes,
+            [FINDER_ID]: FINDER,
+            [MARKDOWN_VIEWER_ID]: MARKDOWN_VIEWER,
         },
         getFile: (fileId) => {
             const file = get().nodes[fileId];

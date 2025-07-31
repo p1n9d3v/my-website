@@ -5,12 +5,13 @@ import path from 'path';
 
 import type { Directory, File, Markdown } from '../_types/file-system';
 
-// 파일을 읽어 가상 파일 시스템 객체를 생성하는 재귀 함수
-export const generateFileSystem = (
+import { BLOG_DIRECTORY } from '../_constants';
+
+export const generateBlogFileSystem = (
     directoryPath: string,
     parentId: string | null = null,
-): { entries: Record<string, File>; childrenIds: string[] } => {
-    const entries: Record<string, File> = {};
+): { nodes: Record<string, File>; childrenIds: string[] } => {
+    const nodes: Record<string, File> = {};
     const childrenIds: string[] = [];
 
     const items = fs.readdirSync(directoryPath, { withFileTypes: true });
@@ -21,8 +22,8 @@ export const generateFileSystem = (
 
         if (item.isDirectory()) {
             // 하위 디렉터리를 재귀적으로 처리
-            const { entries: subEntries, childrenIds: subChildrenIds } =
-                generateFileSystem(fullPath, id);
+            const { nodes: subEntries, childrenIds: subChildrenIds } =
+                generateBlogFileSystem(fullPath, id);
 
             const directory: Directory = {
                 id,
@@ -32,26 +33,25 @@ export const generateFileSystem = (
                 childrenIds: subChildrenIds,
             };
 
-            entries[id] = directory;
-            Object.assign(entries, subEntries); // 하위 항목들을 전체 entries에 병합
+            nodes[id] = directory;
+            Object.assign(nodes, subEntries); // 하위 항목들을 전체 entries에 병합
             childrenIds.push(id);
         } else if (
             item.isFile() &&
             (item.name.endsWith('.md') || item.name.endsWith('.mdx'))
         ) {
-            // .md 또는 .mdx 파일만 처리
-            const content = fs.readFileSync(fullPath, 'utf-8');
-            const textFile: Markdown = {
+            const markdownFile: Markdown = {
                 id,
                 type: 'markdown',
                 name: item.name,
                 parentId,
-                Component: dynamic(() => import('@/app/(blog)/test.mdx')),
+                content: fs.readFileSync(fullPath, 'utf-8'),
             };
-            entries[id] = textFile;
+            nodes[id] = markdownFile;
+            BLOG_DIRECTORY.childrenIds.push(id);
             childrenIds.push(id);
         }
     }
 
-    return { entries, childrenIds };
+    return { nodes, childrenIds };
 };

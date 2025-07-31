@@ -22,7 +22,7 @@ export interface Process<T = File> {
 
 export interface Markdown extends BaseFile {
     type: 'markdown';
-    Component: ComponentType<any>;
+    content: string;
 }
 
 export interface Directory extends BaseFile {

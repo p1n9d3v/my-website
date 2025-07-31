@@ -8,8 +8,8 @@ export const MIN_WIDTH = 600;
 export const MIN_HEIGHT = 400;
 
 //DESC: Files
-export const ROOT_ID = nanoid();
-export const BLOG_ID = nanoid();
+export const ROOT_ID = 'root';
+export const BLOG_ID = 'blog';
 export const FINDER_ID = nanoid();
 export const MARKDOWN_VIEWER_ID = nanoid();
 
@@ -35,7 +35,7 @@ export const BLOG_DIRECTORY: Directory = {
     name: 'blog',
     type: 'directory',
     id: BLOG_ID,
-    childrenIds: [MARKDOWN_VIEWER_ID],
+    childrenIds: [],
     parentId: ROOT_ID,
 };
 
@@ -49,7 +49,7 @@ export const ROOT_DIRECTORY: Directory = {
 
 export const INITIAL_NODES: Record<string, File> = {
     [ROOT_ID]: ROOT_DIRECTORY,
-    [BLOG_ID]: BLOG_DIRECTORY,
     [FINDER_ID]: FINDER,
     [MARKDOWN_VIEWER_ID]: MARKDOWN_VIEWER,
+    [BLOG_ID]: BLOG_DIRECTORY,
 };

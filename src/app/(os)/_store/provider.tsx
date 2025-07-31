@@ -1,4 +1,5 @@
 'use client';
+
 import type { ReactNode } from 'react';
 
 import { createContext, useContext, useRef } from 'react';
@@ -21,6 +22,7 @@ export const OSStoreProvider = ({
     initialNodes,
 }: StoreProviderProps) => {
     const storeRef = useRef<OSStore | null>(null);
+
     if (!storeRef.current) {
         storeRef.current = createOSStore(initialNodes);
     }

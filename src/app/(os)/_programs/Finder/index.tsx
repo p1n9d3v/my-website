@@ -14,6 +14,8 @@ export default function Finder({ process }: FinderProps) {
 
     const files = getFiles(process.file.childrenIds);
 
+    console.log(process);
+    console.log(files);
     return (
         <Window
             contentClassName="finder-window"
