@@ -157,7 +157,6 @@ export default function Window({
 
     useGSAP(
         () => {
-            console.log(boundsRef.current.x);
             if (isHide) {
                 gsap.fromTo(
                     nodeRef.current,
