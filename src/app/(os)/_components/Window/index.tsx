@@ -36,7 +36,8 @@ export default function Window({
         _window;
 
     const nodeRef = useRef<HTMLDivElement>(null);
-    const boundsRef = useRef<Bounds>(bounds);
+    //DESC: window show,hide 애니메이션 위치 동기화용
+    const syncBoundsRef = useRef<Bounds>(bounds);
 
     const resizeWindow = useOSContext((state) => state.resizeWindow);
     const hideWindow = useOSContext((state) => state.hideWindow);
@@ -93,7 +94,7 @@ export default function Window({
             height: workspaceBounds.height,
         };
 
-        boundsRef.current = updatedBounds;
+        syncBoundsRef.current = updatedBounds;
 
         maximizeWindow({
             windowId,
@@ -112,7 +113,7 @@ export default function Window({
         nodeEl.style.transition = 'all 0.2s linear';
 
         if (prevBounds) {
-            boundsRef.current = prevBounds;
+            syncBoundsRef.current = prevBounds;
         }
     };
 
@@ -126,8 +127,8 @@ export default function Window({
             x: data.x,
             y: data.y,
         });
-        boundsRef.current = {
-            ...boundsRef.current,
+        syncBoundsRef.current = {
+            ...syncBoundsRef.current,
             x: data.x,
             y: data.y,
         };
@@ -162,19 +163,20 @@ export default function Window({
         }
     }, [windowId, isMaximized, maximizeWindow]);
 
+    //DESC: Window show,hide 애니메이션
     useGSAP(
         () => {
             if (isHide) {
                 gsap.fromTo(
                     nodeRef.current,
                     {
-                        x: boundsRef.current.x,
-                        y: boundsRef.current.y,
+                        x: syncBoundsRef.current.x,
+                        y: syncBoundsRef.current.y,
                         autoAlpha: 1,
                     },
                     {
-                        x: boundsRef.current.x,
-                        y: boundsRef.current.y + 100,
+                        x: syncBoundsRef.current.x,
+                        y: syncBoundsRef.current.y + 100,
                         autoAlpha: 0,
                         duration: 0.3,
                         ease: 'power2.out',
@@ -184,13 +186,13 @@ export default function Window({
                 gsap.fromTo(
                     nodeRef.current,
                     {
-                        x: boundsRef.current.x,
-                        y: boundsRef.current.y + 100,
+                        x: syncBoundsRef.current.x,
+                        y: syncBoundsRef.current.y + 100,
                         autoAlpha: 0,
                     },
                     {
-                        x: boundsRef.current.x,
-                        y: boundsRef.current.y,
+                        x: syncBoundsRef.current.x,
+                        y: syncBoundsRef.current.y,
                         autoAlpha: 1,
                         duration: 0.3,
                         ease: 'power2.out',
