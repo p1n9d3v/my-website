@@ -46,6 +46,7 @@ export default function Window({
     const restoreWindow = useOSContext((state) => state.restoreWindow);
     const dragWindow = useOSContext((state) => state.dragWindow);
     const terminateProcess = useOSContext((state) => state.terminateProcess);
+    const activateWindow = useOSContext((state) => state.activateWindow);
 
     const {
         leftRef,
@@ -115,6 +116,10 @@ export default function Window({
         if (prevBounds) {
             syncBoundsRef.current = prevBounds;
         }
+    };
+
+    const handleActivateWindow = () => {
+        activateWindow(windowId);
     };
 
     const handleStartDrag = () => {
@@ -218,6 +223,7 @@ export default function Window({
             )}
             onStart={handleStartDrag}
             onStop={handleStopDrag}
+            onMouseDown={handleActivateWindow}
         >
             <div
                 ref={nodeRef}
