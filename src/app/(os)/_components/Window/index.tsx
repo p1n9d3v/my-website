@@ -32,7 +32,8 @@ export default function Window({
     renderHeaderContent,
 }: WindowProps) {
     const _window = useOSContext((state) => state.windows[windowId]);
-    const { bounds, isHide, zIndex, isMaximized, processId } = _window;
+    const { bounds, prevBounds, isHide, zIndex, isMaximized, processId } =
+        _window;
 
     const nodeRef = useRef<HTMLDivElement>(null);
     const boundsRef = useRef<Bounds>(bounds);
@@ -92,6 +93,8 @@ export default function Window({
             height: workspaceBounds.height,
         };
 
+        boundsRef.current = updatedBounds;
+
         maximizeWindow({
             windowId,
             bounds: updatedBounds,
@@ -107,6 +110,10 @@ export default function Window({
 
         restoreWindow(windowId);
         nodeEl.style.transition = 'all 0.2s linear';
+
+        if (prevBounds) {
+            boundsRef.current = prevBounds;
+        }
     };
 
     const handleStartDrag = () => {
