@@ -1,11 +1,8 @@
 import { nanoid } from 'nanoid';
-import dynamic from 'next/dynamic';
 import fs from 'node:fs';
 import path from 'path';
 
 import type { Directory, File, Markdown } from '../_types/file-system';
-
-import { BLOG_DIRECTORY } from '../_constants';
 
 export const generateBlogFileSystem = (
     directoryPath: string,
@@ -48,7 +45,6 @@ export const generateBlogFileSystem = (
                 content: fs.readFileSync(fullPath, 'utf-8'),
             };
             nodes[id] = markdownFile;
-            BLOG_DIRECTORY.childrenIds.push(id);
             childrenIds.push(id);
         }
     }

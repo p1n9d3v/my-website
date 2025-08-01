@@ -6,7 +6,7 @@ import Draggable from 'react-draggable';
 
 import { type File } from '@/os/_types/file-system';
 
-import { FINDER_ID, MARKDOWN_VIEWER_ID } from '../_constants';
+import { FINDER_ID, MARKDOWN_VIEWER_ID } from '../_constants/config';
 import { useOSContext } from '../_store/provider';
 
 interface LauncherProps extends ComponentProps<'button'> {

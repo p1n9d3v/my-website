@@ -4,7 +4,7 @@ import { groupBy } from 'lodash';
 
 import { cn } from '@/utils/cn';
 
-import { FINDER, MARKDOWN_VIEWER } from '../../_constants';
+import { INITIAL_PROGRAMS } from '../../_constants/config';
 import { useOSContext } from '../../_store/provider';
 import DockIcon from './DockIcon';
 
@@ -13,7 +13,7 @@ export default function Dock() {
     const unhideWindow = useOSContext((state) => state.unhideWindow);
 
     //TODO: Finder, Terminal is default programs
-    const defaultPrograms = [FINDER, MARKDOWN_VIEWER];
+    const defaultPrograms = Object.values(INITIAL_PROGRAMS);
 
     const runningPrograms = groupBy(Object.values(_processes), 'program.id');
 

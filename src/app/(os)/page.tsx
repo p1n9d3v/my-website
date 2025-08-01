@@ -4,7 +4,7 @@ import { Suspense } from 'react';
 
 import Launcher from '@/os/_components/Launcher';
 
-import { ROOT_ID } from './_constants';
+import { ROOT_ID } from './_constants/config';
 import { useOSContext } from './_store/provider';
 
 export default function Page() {
