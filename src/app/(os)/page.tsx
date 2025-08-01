@@ -14,6 +14,7 @@ export default function Page() {
     const processes = useOSContext((state) => state.processes);
 
     const files = rootDirectory.childrenIds.map((childId) => getFile(childId));
+    console.log(111);
 
     return (
         <>

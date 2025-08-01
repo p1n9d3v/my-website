@@ -23,8 +23,6 @@ export default function Layout({ children }: OSLayoutProps) {
 
     Directories['blog'].childrenIds = childrenIds;
 
-    console.log(Directories);
-
     return (
         <OSStoreProvider
             initialNodes={{

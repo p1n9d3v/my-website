@@ -12,9 +12,10 @@ import { useOSContext } from '../_store/provider';
 interface LauncherProps extends ComponentProps<'button'> {
     bounds: string;
     file: File;
+    onDoubleClick?: () => void;
 }
 
-const getProgramId = (file: File) => {
+const getDefaultProgramId = (file: File) => {
     switch (file.type) {
         case 'program':
             return file.id;
@@ -25,13 +26,18 @@ const getProgramId = (file: File) => {
     }
 };
 
-export default function Launcher({ file, bounds, ...rest }: LauncherProps) {
+export default function Launcher({
+    file,
+    bounds,
+    onDoubleClick,
+    ...rest
+}: LauncherProps) {
     const nodeRef = useRef<HTMLButtonElement>(null);
     const launchProgram = useOSContext((state) => state.launchProgram);
     const openWindow = useOSContext((state) => state.openWindow);
     const getProgram = useOSContext((state) => state.getProgram);
 
-    const programId = getProgramId(file);
+    const programId = getDefaultProgramId(file);
     const program = getProgram(programId);
 
     const handleLaunchProcess = () => {
@@ -51,7 +57,9 @@ export default function Launcher({ file, bounds, ...rest }: LauncherProps) {
         <Draggable nodeRef={nodeRef} bounds={bounds}>
             <button
                 ref={nodeRef}
-                onDoubleClick={handleLaunchProcess}
+                onDoubleClick={
+                    onDoubleClick ? onDoubleClick : handleLaunchProcess
+                }
                 className="flex flex-col items-center"
                 {...rest}
             >
