@@ -1,116 +1,85 @@
-import { immer } from 'zustand/middleware/immer';
+import type { StateCreator } from 'zustand';
 
 import type { Bounds, Window } from '@/os/_types/window';
+
+import type { OSStoreState } from '..';
 
 import { MIN_HEIGHT, MIN_WIDTH } from '../../_constants';
 
 export interface WindowStoreStates {
-    windows: Record<string, Window>;
-    windowZIndex: number;
-    activeWindowId: string;
+    data: Record<string, Window>;
+    zindex: number;
 }
 
 export interface WindowStoreActions {
-    openWindow: (windowId: string, processId: string) => void;
-    dragWindow: (windowId: string, bounds: Pick<Bounds, 'x' | 'y'>) => void;
-    resizeWindow: (windowId: string, bounds: Bounds) => void;
-    maximizeWindow: ({
-        windowId,
-        bounds,
-        prevBounds,
-    }: {
-        windowId: string;
-        bounds: Bounds;
-        prevBounds?: Bounds;
-    }) => void;
-    restoreWindow: (windowId: string) => void;
-    hideWindow: (windowId: string) => void;
-    unhideWindow: (windowIds: string[]) => void;
-    closeWindow: (windowId: string) => void;
-    activateWindow: (windowId: string) => void;
+    open: (windowId: string, processId: string) => void;
+    hide: (windowId: string) => void;
+    unhide: (windowIds: string[]) => void;
+    close: (windowId: string) => void;
+    active: (windowId: string) => void;
+    update: (windowId: string, bounds: Partial<Bounds>) => void;
 }
 
-export type WindowSlice = WindowStoreStates & WindowStoreActions;
+export type WindowSlice = WindowStoreStates & {
+    actions: WindowStoreActions;
+};
 
-export const createWindowSlice = immer<WindowSlice>((set, get) => ({
-    windows: {},
-    windowZIndex: 0,
-    activeWindowId: '',
-    activateWindow: (windowId) => {
-        set((state) => {
-            state.activeWindowId = windowId;
-            state.windows[windowId].zIndex = state.windowZIndex++;
-        });
-    },
-    openWindow: (windowId, processId) => {
-        set((state) => {
-            const bounds = {
-                x: window.innerWidth / 2 - MIN_WIDTH / 2,
-                y: window.innerHeight / 2 - MIN_HEIGHT / 2,
-                width: MIN_WIDTH,
-                height: MIN_HEIGHT,
-            };
-
-            state.windows[windowId] = {
-                id: windowId,
-                bounds,
-                processId,
-                prevBounds: null,
-                zIndex: state.windowZIndex++,
-                isHide: false,
-                isMaximized: false,
-            };
-        });
-    },
-    closeWindow: (windowId) => {
-        set((state) => {
-            delete state.windows[windowId];
-        });
-    },
-    hideWindow: (windowId) => {
-        set((state) => {
-            state.windows[windowId].isHide = true;
-        });
-    },
-    unhideWindow: (windowIds) => {
-        set((state) => {
-            windowIds.forEach((windowId) => {
-                state.windows[windowId].isHide = false;
+export const createWindowSlice: StateCreator<
+    OSStoreState,
+    [['zustand/immer', never]],
+    [],
+    WindowSlice
+> = (set, get) => ({
+    data: {},
+    zindex: 0,
+    actions: {
+        update: (windowId, bounds) => {
+            set((state) => {
+                state.window.data[windowId].bounds = {
+                    ...state.window.data[windowId].bounds,
+                    ...bounds,
+                };
             });
-        });
-    },
-    dragWindow: (windowId, bounds) => {
-        set((state) => {
-            const window = state.windows[windowId];
-            window.bounds = {
-                ...window.bounds,
-                ...bounds,
-            };
-        });
-    },
-    resizeWindow: (windowId, bounds) => {
-        set((state) => {
-            const window = state.windows[windowId];
+        },
+        active: (windowId) => {
+            set((state) => {
+                state.window.data[windowId].zIndex = state.window.zindex++;
+            });
+        },
+        open: (windowId, processId) => {
+            set((state) => {
+                const bounds = {
+                    x: 200,
+                    y: 400,
+                    width: MIN_WIDTH,
+                    height: MIN_HEIGHT,
+                };
 
-            window.bounds = bounds;
-            window.prevBounds = null;
-            window.isMaximized = false;
-        });
+                state.window.data[windowId] = {
+                    id: windowId,
+                    bounds,
+                    processId,
+                    zIndex: state.window.zindex++,
+                    isHide: false,
+                };
+            });
+        },
+        close: (windowId) => {
+            set((state) => {
+                delete state.window.data[windowId];
+            });
+        },
+        hide: (windowId) => {
+            set((state) => {
+                state.window.data[windowId].isHide = true;
+            });
+        },
+        unhide: (windowIds) => {
+            set((state) => {
+                windowIds.forEach((windowId) => {
+                    state.window.data[windowId].isHide = false;
+                });
+            });
+        },
     },
-    maximizeWindow: ({ windowId, bounds, prevBounds }) => {
-        set((state) => {
-            const window = state.windows[windowId];
-            window.bounds = bounds;
-            window.prevBounds = prevBounds ?? window.prevBounds;
-            window.isMaximized = true;
-        });
-    },
-    restoreWindow: (windowId) => {
-        set((state) => {
-            const window = state.windows[windowId];
-            window.bounds = window.prevBounds!;
-            window.prevBounds = null;
-            window.isMaximized = false;
-        });
-    },
-}));
+});

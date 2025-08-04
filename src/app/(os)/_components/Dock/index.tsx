@@ -10,7 +10,7 @@ import DockIcon from './DockIcon';
 
 export default function Dock() {
     const _processes = useOSContext((state) => state.processes);
-    const unhideWindow = useOSContext((state) => state.unhideWindow);
+    const unhideWindow = useOSContext((state) => state.window.actions.unhide);
 
     //TODO: Finder, Terminal is default programs
     const defaultPrograms = Object.values(INITIAL_PROGRAMS);

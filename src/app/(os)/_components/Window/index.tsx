@@ -1,15 +1,14 @@
 'use client';
+
 import type { ReactNode } from 'react';
-import type { DraggableData, DraggableEvent } from 'react-draggable';
 
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
-import { useCallback, useEffect, useRef } from 'react';
-import Draggable from 'react-draggable';
+import { useRef, useState } from 'react';
+import { Rnd } from 'react-rnd';
 
 import type { Bounds } from '@/os/_types/window';
 
-import useWindowResize from '@/os/_hooks/useWindowResize';
 import { useOSContext } from '@/os/_store/provider';
 import { cn } from '@/utils/cn';
 
@@ -19,7 +18,6 @@ interface WindowProps {
     windowId: string;
     children: ReactNode;
     title?: string;
-    contentClassName?: string;
     renderHeaderContent?: ReactNode;
 }
 
@@ -28,179 +26,81 @@ export default function Window({
     windowId,
     title,
     children,
-    contentClassName,
     renderHeaderContent,
 }: WindowProps) {
-    const _window = useOSContext((state) => state.windows[windowId]);
-    const { bounds, prevBounds, isHide, zIndex, isMaximized, processId } =
-        _window;
+    const _window = useOSContext((state) => state.window.data[windowId]);
+    const { bounds, isHide, zIndex, processId } = _window;
 
-    const nodeRef = useRef<HTMLDivElement>(null);
-    //DESC: window show,hide 애니메이션 위치 동기화용
-    const syncBoundsRef = useRef<Bounds>(bounds);
+    const [isMaximized, setIsMaximized] = useState(false);
 
-    const resizeWindow = useOSContext((state) => state.resizeWindow);
-    const hideWindow = useOSContext((state) => state.hideWindow);
-    const closeWindow = useOSContext((state) => state.closeWindow);
-    const maximizeWindow = useOSContext((state) => state.maximizeWindow);
-    const restoreWindow = useOSContext((state) => state.restoreWindow);
-    const dragWindow = useOSContext((state) => state.dragWindow);
+    const nodeRef = useRef<Rnd>(null);
+    const prevBoundsRef = useRef<Bounds>(bounds);
+    const initialRenderRef = useRef(false);
+
+    const { hide, close, active, update } = useOSContext(
+        (state) => state.window.actions,
+    );
     const terminateProcess = useOSContext((state) => state.terminateProcess);
-    const activateWindow = useOSContext((state) => state.activateWindow);
-
-    const {
-        leftRef,
-        rightRef,
-        topRef,
-        bottomRef,
-        leftTopRef,
-        rightTopRef,
-        leftBottomRef,
-        rightBottomRef,
-    } = useWindowResize({
-        ref: nodeRef,
-        workspace: '.workspace',
-        onUpdateBounds: useCallback(
-            (bounds: Bounds) => {
-                resizeWindow(windowId, bounds);
-            },
-            [windowId, resizeWindow],
-        ),
-    });
 
     const handleHideWindow = () => {
-        hideWindow(windowId);
+        hide(windowId);
     };
 
-    const handleCloseWindow = () => {
-        closeWindow(windowId);
-        terminateProcess(processId);
-    };
-
-    const handleMaximizeWindow = useCallback(() => {
-        const workspaceEl = document.querySelector('.workspace');
-        if (!workspaceEl) return;
-
-        const workspaceBounds = workspaceEl.getBoundingClientRect();
-
-        const nodeEl = nodeRef.current;
-        if (!nodeEl) return;
-
-        nodeEl.style.transition = 'all 0.2s linear';
-
-        const updatedBounds = {
-            x: 0,
-            y: 0,
-            width: workspaceBounds.width,
-            height: workspaceBounds.height,
-        };
-
-        syncBoundsRef.current = updatedBounds;
-
-        maximizeWindow({
-            windowId,
-            bounds: updatedBounds,
-            prevBounds: {
-                ...bounds,
-            },
-        });
-    }, [windowId, bounds, maximizeWindow]);
-
-    const handleRestoreWindow = () => {
-        const nodeEl = nodeRef.current;
-        if (!nodeEl) return;
-
-        restoreWindow(windowId);
-        nodeEl.style.transition = 'all 0.2s linear';
-
-        if (prevBounds) {
-            syncBoundsRef.current = prevBounds;
-        }
-    };
-
-    const handleActivateWindow = () => {
-        activateWindow(windowId);
-    };
-
-    const handleStartDrag = () => {
-        document.body.style.cursor = 'grabbing';
-    };
-
-    const handleStopDrag = (_: DraggableEvent, data: DraggableData) => {
-        document.body.style.cursor = 'default';
-        dragWindow(windowId, {
-            x: data.x,
-            y: data.y,
-        });
-        syncBoundsRef.current = {
-            ...syncBoundsRef.current,
-            x: data.x,
-            y: data.y,
-        };
-    };
-
-    //DESC: Browser Window Resize 처리
-    useEffect(() => {
-        if (isMaximized) {
-            const handleMaximizeWindow = () => {
-                const workspaceEl = document.querySelector('.workspace');
-                if (!workspaceEl) return;
-
-                const workspaceBounds = workspaceEl.getBoundingClientRect();
-
-                const updatedBounds = {
-                    x: 0,
-                    y: 0,
-                    width: workspaceBounds.width,
-                    height: workspaceBounds.height,
-                };
-
-                maximizeWindow({
-                    windowId,
-                    bounds: updatedBounds,
-                });
-            };
-            window.addEventListener('resize', handleMaximizeWindow);
-
-            return () => {
-                window.removeEventListener('resize', handleMaximizeWindow);
-            };
-        }
-    }, [windowId, isMaximized, maximizeWindow]);
-
-    //DESC: Window show,hide 애니메이션
     useGSAP(
         () => {
-            if (isHide) {
+            const nodeEl = nodeRef.current?.getSelfElement();
+            const desktopEl = document.querySelector('.desktop');
+            if (!desktopEl || !nodeEl) return;
+
+            if (!initialRenderRef.current) {
                 gsap.fromTo(
-                    nodeRef.current,
+                    nodeEl,
                     {
-                        x: syncBoundsRef.current.x,
-                        y: syncBoundsRef.current.y,
-                        autoAlpha: 1,
+                        autoAlpha: 0,
                     },
                     {
-                        x: syncBoundsRef.current.x,
-                        y: syncBoundsRef.current.y + 100,
+                        autoAlpha: 1,
+                        duration: 0.2,
+                        ease: 'power3.inOut',
+                        onComplete: () => {
+                            initialRenderRef.current = true;
+                        },
+                    },
+                );
+
+                return;
+            }
+
+            const desktopBounds = desktopEl.getBoundingClientRect();
+            if (isHide) {
+                gsap.fromTo(
+                    nodeEl,
+                    {
+                        ...bounds,
+                    },
+                    {
+                        y: desktopBounds.height,
+                        x: desktopBounds.width / 2,
+                        width: 0,
                         autoAlpha: 0,
-                        duration: 0.3,
-                        ease: 'power2.out',
+                        duration: 0.5,
+                        ease: 'power3.inOut',
                     },
                 );
             } else {
                 gsap.fromTo(
-                    nodeRef.current,
+                    nodeEl,
                     {
-                        x: syncBoundsRef.current.x,
-                        y: syncBoundsRef.current.y + 100,
+                        y: desktopBounds.height,
+                        x: desktopBounds.width / 2,
+                        width: 0,
                         autoAlpha: 0,
                     },
                     {
-                        x: syncBoundsRef.current.x,
-                        y: syncBoundsRef.current.y,
+                        ...bounds,
                         autoAlpha: 1,
-                        duration: 0.3,
-                        ease: 'power2.out',
+                        duration: 0.5,
+                        ease: 'power2.inOut',
                     },
                 );
             }
@@ -210,103 +110,132 @@ export default function Window({
         },
     );
 
+    const handleCloseWindow = () => {
+        const nodeEl = nodeRef.current?.getSelfElement();
+        if (!nodeEl) return;
+
+        gsap.fromTo(
+            nodeEl,
+            {
+                autoAlpha: 1,
+            },
+            {
+                autoAlpha: 0,
+                duration: 0.3,
+                ease: 'power3.inOut',
+                onComplete: () => {
+                    close(windowId);
+                    terminateProcess(processId);
+                },
+            },
+        );
+    };
+
+    const handleMaximizeWindow = () => {
+        const desktopEl = document.querySelector('.desktop');
+        const nodeEl = nodeRef.current?.getSelfElement();
+        if (!desktopEl || !nodeEl) return;
+
+        const desktopBounds = desktopEl.getBoundingClientRect();
+
+        prevBoundsRef.current = { ...bounds };
+        gsap.fromTo(
+            nodeEl,
+            {
+                ...bounds,
+            },
+            {
+                x: 0,
+                y: 0,
+                width: desktopBounds.width,
+                height: desktopBounds.height,
+                onComplete: () => {
+                    update(windowId, {
+                        x: 0,
+                        y: 0,
+                        width: desktopBounds.width,
+                        height: desktopBounds.height,
+                    });
+                    setIsMaximized(true);
+                },
+            },
+        );
+    };
+
+    const handleRestoreWindow = () => {
+        const nodeEl = nodeRef.current?.getSelfElement();
+        if (!nodeEl) return;
+
+        gsap.fromTo(
+            nodeEl,
+            {
+                ...bounds,
+            },
+            {
+                ...prevBoundsRef.current,
+                onComplete: () => {
+                    update(windowId, {
+                        ...prevBoundsRef.current,
+                    });
+                    setIsMaximized(false);
+                },
+            },
+        );
+    };
+
+    const handleActivateWindow = () => {
+        active(windowId);
+    };
+
     return (
-        <Draggable
-            nodeRef={nodeRef}
-            handle=".window-title-bar"
-            bounds=".workspace"
-            disabled={isMaximized}
-            position={bounds}
-            defaultClassName={cn(
-                'left-0 top-0',
-                'transition-opacity duration-300 ease-out',
-            )}
-            onStart={handleStartDrag}
-            onStop={handleStopDrag}
+        <Rnd
+            size={{ width: bounds.width, height: bounds.height }}
+            position={{ x: bounds.x, y: bounds.y }}
+            onDragStop={(_, data) => {
+                update(windowId, {
+                    x: data.x,
+                    y: data.y,
+                });
+            }}
+            onResizeStop={(_, __, ref, ___, position) => {
+                update(windowId, {
+                    width: ref.offsetWidth,
+                    height: ref.offsetHeight,
+                    x: position.x,
+                    y: position.y,
+                });
+            }}
+            dragHandleClassName="window-title-bar"
             onMouseDown={handleActivateWindow}
+            ref={nodeRef}
+            className={cn(
+                'bg-black/30 backdrop-blur-sm',
+                'rounded-lg border border-white/20 shadow-2xl',
+            )}
+            style={{
+                zIndex,
+            }}
         >
-            <div
-                ref={nodeRef}
-                className={cn(
-                    'absolute',
-                    'bg-black/30 backdrop-blur-sm',
-                    'rounded-lg border border-white/20 shadow-2xl',
-                )}
-                style={{
-                    width: bounds.width,
-                    height: bounds.height,
-                    zIndex,
-                }}
-                onTransitionEnd={() => {
-                    const nodeEl = nodeRef.current;
-                    if (!nodeEl) return;
-
-                    nodeEl.style.transition = '';
-                }}
-            >
-                <WindowHeader
-                    className="window-title-bar"
-                    isMaximized={isMaximized}
-                    renderContent={
-                        renderHeaderContent ?? (
-                            <div className="absolute top-0 left-1/2 -translate-x-1/2 transform">
-                                <p className="text-xl text-green-500">
-                                    {title ?? '제목 없음'}
-                                </p>
-                            </div>
-                        )
-                    }
-                    onClose={handleCloseWindow}
-                    onMaximize={handleMaximizeWindow}
-                    onRestore={handleRestoreWindow}
-                    onHide={handleHideWindow}
-                />
-
-                {/*DESC: 컨텐츠 영역 */}
-                <div
-                    className={cn(
-                        'relative',
-                        'h-[calc(100%-32px)]',
-                        contentClassName ?? '',
-                    )}
-                >
-                    {children}
-                </div>
-
-                {/*DESC: Resizer */}
-                <div
-                    ref={leftRef}
-                    className="absolute top-0 left-0 h-full w-1 cursor-ew-resize"
-                />
-                <div
-                    ref={rightRef}
-                    className="absolute top-0 right-0 h-full w-1 cursor-ew-resize"
-                />
-                <div
-                    ref={topRef}
-                    className="absolute top-0 left-0 h-1 w-full cursor-ns-resize"
-                />
-                <div
-                    ref={bottomRef}
-                    className="absolute bottom-0 left-0 h-1 w-full cursor-s-resize"
-                />
-                <div
-                    ref={leftTopRef}
-                    className="absolute top-0 left-0 h-2 w-2 cursor-nwse-resize rounded-full"
-                />
-                <div
-                    ref={rightTopRef}
-                    className="absolute top-0 right-0 h-2 w-2 cursor-nesw-resize rounded-full"
-                />
-                <div
-                    ref={leftBottomRef}
-                    className="absolute bottom-0 left-0 h-2 w-2 cursor-nesw-resize rounded-full"
-                />
-                <div
-                    ref={rightBottomRef}
-                    className="absolute right-0 bottom-0 h-2 w-2 cursor-nwse-resize rounded-full"
-                />
+            <WindowHeader
+                className="window-title-bar"
+                isMaximized={isMaximized}
+                renderContent={
+                    renderHeaderContent ?? (
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 transform">
+                            <p className="text-xl text-green-500">
+                                {title ?? '제목 없음'}
+                            </p>
+                        </div>
+                    )
+                }
+                onClose={handleCloseWindow}
+                onMaximize={handleMaximizeWindow}
+                onRestore={handleRestoreWindow}
+                onHide={handleHideWindow}
+            />
+            <div className="relative h-[calc(100%-32px)] w-full">
+                {children}
             </div>
-        </Draggable>
+        </Rnd>
     );
 }

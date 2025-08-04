@@ -32,11 +32,11 @@ export default function Layout({ children }: OSLayoutProps) {
         >
             <div className="relative h-screen w-screen overflow-hidden">
                 <MenuBar />
-                <div className="workspace relative top-10 h-[calc(100%-124px)] w-full">
+                <div className="desktop relative top-10 h-[calc(100%-124px)] w-full">
                     {children}
                 </div>
                 <Dock />
-                <WallPaper />
+                {/* <WallPaper /> */}
             </div>
         </OSStoreProvider>
     );

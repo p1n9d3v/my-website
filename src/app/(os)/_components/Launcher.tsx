@@ -34,7 +34,7 @@ export default function Launcher({
 }: LauncherProps) {
     const nodeRef = useRef<HTMLButtonElement>(null);
     const launchProgram = useOSContext((state) => state.launchProgram);
-    const openWindow = useOSContext((state) => state.openWindow);
+    const openWindow = useOSContext((state) => state.window.actions.open);
     const getProgram = useOSContext((state) => state.getProgram);
 
     const programId = getDefaultProgramId(file);
