@@ -1,58 +1,30 @@
-import { immer } from 'zustand/middleware/immer';
+import type { StateCreator } from 'zustand';
 
-import type { Program } from '@/os/_types/file-system';
+import { type File } from '@/os/_types/file-system';
+import { generateBlogFileSystem } from '@/os/_utils';
 
-import { INITIAL_PROGRAMS } from '@/os/_constants/config';
-import {
-    type Directory,
-    type File,
-    isDirectory,
-    isProgram,
-} from '@/os/_types/file-system';
+import type { OSStoreState } from '..';
 
 export interface FileSystemStoreStates {
-    nodes: Record<string, File>;
+    data: Record<string, File>;
 }
 
 export interface FileSystemStoreActions {
-    getDirectory: (directoryId: string) => Directory;
-    getProgram: (programId: string) => Program;
-    getFile: (fileId: string) => File;
-    getFiles: (fileIds: string[]) => File[];
+    initialize: () => void;
 }
 
-export type FileSystemSlice = FileSystemStoreStates & FileSystemStoreActions;
+export type FileSystemSlice = FileSystemStoreStates & {
+    actions: FileSystemStoreActions;
+};
 
-export const createFileSystemSlice = (initialNodes: Record<string, File>) =>
-    immer<FileSystemSlice>((set, get) => ({
-        nodes: {
-            ...initialNodes,
-            ...INITIAL_PROGRAMS,
-        },
-        getFile: (fileId) => {
-            const file = get().nodes[fileId];
-
-            return file;
-        },
-        getFiles: (fileIds) => {
-            return fileIds.map((fileId) => get().getFile(fileId));
-        },
-        getProgram: (programId) => {
-            const program = get().nodes[programId];
-
-            if (!isProgram(program)) {
-                throw new Error('The program is not found');
-            }
-
-            return program;
-        },
-        getDirectory: (directoryId) => {
-            const directory = get().nodes[directoryId];
-
-            if (!isDirectory(directory)) {
-                throw new Error('The directory is not found');
-            }
-
-            return directory;
-        },
-    }));
+export const createFileSystemSlice: StateCreator<
+    OSStoreState,
+    [['zustand/immer', never]],
+    [],
+    FileSystemSlice
+> = (set, get) => ({
+    data: {},
+    actions: {
+        initialize: () => {},
+    },
+});

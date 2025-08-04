@@ -6,7 +6,6 @@ import type { Directory, File, Process } from '@/os/_types/file-system';
 
 import Launcher from '@/os/_components/Launcher';
 import Window from '@/os/_components/Window';
-import { useOSContext } from '@/os/_store/provider';
 
 interface FinderProps {
     process: Process<Directory>;
@@ -17,28 +16,27 @@ export default function Finder({ process }: FinderProps) {
     const [history, setHistory] = useState<Set<string>>(
         new Set([process.file.id]),
     );
-    const getFiles = useOSContext((state) => state.getFiles);
-    const getDirectory = useOSContext((state) => state.getDirectory);
+    // const getFiles = useOSContext((state) => state.getFiles);
+    // const getDirectory = useOSContext((state) => state.getDirectory);
 
-    const [files, setFiles] = useState<File[]>(
-        getFiles(process.file.childrenIds),
-    );
+    const [files, setFiles] = useState<File[]>();
+    // getFiles(process.file.childrenIds),
 
     const handleDoubleClick = (directory: Directory) => {
-        setFiles(getFiles(directory.childrenIds));
+        // setFiles(getFiles(directory.childrenIds));
         setHistory(new Set([...history, directory.id]));
     };
 
     const handleBack = () => {
         const beforeId = [...history][history.size - 2];
-        const directory = getDirectory(beforeId);
-        setFiles(getFiles(directory.childrenIds));
+        // const directory = getDirectory(beforeId);
+        // setFiles(getFiles(directory.childrenIds));
     };
 
     const handleForward = () => {
         const nextId = [...history][history.size - 1];
-        const directory = getDirectory(nextId);
-        setFiles(getFiles(directory.childrenIds));
+        // const directory = getDirectory(nextId);
+        // setFiles(getFiles(directory.childrenIds));
     };
 
     return (

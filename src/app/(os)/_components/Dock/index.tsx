@@ -5,12 +5,12 @@ import { groupBy } from 'lodash';
 import { cn } from '@/utils/cn';
 
 import { INITIAL_PROGRAMS } from '../../_constants/config';
-import { useOSContext } from '../../_store/provider';
+import { useOSStore } from '../../_store';
 import DockIcon from './DockIcon';
 
 export default function Dock() {
-    const _processes = useOSContext((state) => state.processes);
-    const unhideWindow = useOSContext((state) => state.window.actions.unhide);
+    const _processes = useOSStore((state) => state.process.data);
+    const unhideWindow = useOSStore((state) => state.window.actions.unhide);
 
     //TODO: Finder, Terminal is default programs
     const defaultPrograms = Object.values(INITIAL_PROGRAMS);

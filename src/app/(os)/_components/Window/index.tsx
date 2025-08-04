@@ -9,9 +9,9 @@ import { Rnd } from 'react-rnd';
 
 import type { Bounds } from '@/os/_types/window';
 
-import { useOSContext } from '@/os/_store/provider';
 import { cn } from '@/utils/cn';
 
+import { useOSStore } from '../../_store';
 import WindowHeader from './WindowHeader';
 
 interface WindowProps {
@@ -28,7 +28,7 @@ export default function Window({
     children,
     renderHeaderContent,
 }: WindowProps) {
-    const _window = useOSContext((state) => state.window.data[windowId]);
+    const _window = useOSStore((state) => state.window.data[windowId]);
     const { bounds, isHide, zIndex, processId } = _window;
 
     const [isMaximized, setIsMaximized] = useState(false);
@@ -37,10 +37,12 @@ export default function Window({
     const prevBoundsRef = useRef<Bounds>(bounds);
     const initialRenderRef = useRef(false);
 
-    const { hide, close, active, update } = useOSContext(
+    const { hide, close, active, update } = useOSStore(
         (state) => state.window.actions,
     );
-    const terminateProcess = useOSContext((state) => state.terminateProcess);
+    const terminateProcess = useOSStore(
+        (state) => state.process.actions.terminate,
+    );
 
     const handleHideWindow = () => {
         hide(windowId);

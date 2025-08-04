@@ -1,13 +1,15 @@
-import { immer } from 'zustand/middleware/immer';
+import type { StateCreator } from 'zustand';
 
 import type { File, Process, Program } from '@/os/_types/file-system';
 
+import type { OSStoreState } from '..';
+
 export interface ProcessStoreStates {
-    processes: Record<string, Process>;
+    data: Record<string, Process>;
 }
 
 export interface ProcessStoreActions {
-    launchProgram: ({
+    launch: ({
         processId,
         windowId,
         program,
@@ -18,26 +20,35 @@ export interface ProcessStoreActions {
         program: Program;
         file: File;
     }) => void;
-    terminateProcess: (processId: string) => void;
+    terminate: (processId: string) => void;
 }
 
-export type ProcessSlice = ProcessStoreStates & ProcessStoreActions;
+export type ProcessSlice = ProcessStoreStates & {
+    actions: ProcessStoreActions;
+};
 
-export const createProcessSlice = immer<ProcessSlice>((set) => ({
-    processes: {},
-    launchProgram: ({ processId, program, windowId, file }) => {
-        set((state) => {
-            state.processes[processId] = {
-                id: processId,
-                program,
-                windowId,
-                file,
-            };
-        });
+export const createProcessSlice: StateCreator<
+    OSStoreState,
+    [['zustand/immer', never]],
+    [],
+    ProcessSlice
+> = (set) => ({
+    data: {},
+    actions: {
+        launch: ({ processId, program, windowId, file }) => {
+            set((state) => {
+                state.process.data[processId] = {
+                    id: processId,
+                    program,
+                    windowId,
+                    file,
+                };
+            });
+        },
+        terminate: (processId) => {
+            set((state) => {
+                delete state.process.data[processId];
+            });
+        },
     },
-    terminateProcess: (processId) => {
-        set((state) => {
-            delete state.processes[processId];
-        });
-    },
-}));
+});
