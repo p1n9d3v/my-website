@@ -1,6 +1,6 @@
 import type { StateCreator } from 'zustand';
 
-import type { Bounds, Window } from '@/os/_types/window';
+import type { Bounds, Window } from '@/os/_data/window';
 
 import type { OSStoreState } from '..';
 

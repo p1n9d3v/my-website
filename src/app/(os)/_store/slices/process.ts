@@ -1,5 +1,7 @@
 import type { StateCreator } from 'zustand';
 
+import { nanoid } from 'nanoid';
+
 import type { File, Process, Program } from '@/os/_types/file-system';
 
 import type { OSStoreState } from '..';
@@ -9,17 +11,7 @@ export interface ProcessStoreStates {
 }
 
 export interface ProcessStoreActions {
-    launch: ({
-        processId,
-        windowId,
-        program,
-        file,
-    }: {
-        processId: string;
-        windowId: string;
-        program: Program;
-        file: File;
-    }) => void;
+    launch: (file: File) => void;
     terminate: (processId: string) => void;
 }
 
@@ -32,18 +24,22 @@ export const createProcessSlice: StateCreator<
     [['zustand/immer', never]],
     [],
     ProcessSlice
-> = (set) => ({
+> = (set, get) => ({
     data: {},
     actions: {
-        launch: ({ processId, program, windowId, file }) => {
+        launch: (file) => {
+            const processId = nanoid();
+            const windowId = nanoid();
             set((state) => {
                 state.process.data[processId] = {
                     id: processId,
-                    program,
                     windowId,
                     file,
                 };
             });
+
+            const { window } = get();
+            window.actions.open(windowId, processId);
         },
         terminate: (processId) => {
             set((state) => {

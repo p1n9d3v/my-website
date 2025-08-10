@@ -1,28 +1,18 @@
 'use client';
 
 import { nanoid } from 'nanoid';
-import { Suspense, useRef, type ComponentProps } from 'react';
+import Image from 'next/image';
+import { type ComponentProps } from 'react';
 
 import { type File } from '@/os/_types/file-system';
 
-import { FINDER_ID, MARKDOWN_VIEWER_ID } from '../_constants/config';
+import { useOSStore } from '../_store';
 
 interface LauncherProps extends ComponentProps<'button'> {
-    bounds: string;
-    file: File;
+    bounds?: string;
+    file?: File;
     onDoubleClick?: () => void;
 }
-
-const getDefaultProgramId = (file: File) => {
-    switch (file.type) {
-        case 'program':
-            return file.id;
-        case 'markdown':
-            return MARKDOWN_VIEWER_ID;
-        case 'directory':
-            return FINDER_ID;
-    }
-};
 
 export default function Launcher({
     file,
@@ -30,38 +20,23 @@ export default function Launcher({
     onDoubleClick,
     ...rest
 }: LauncherProps) {
-    // const nodeRef = useRef<HTMLButtonElement>(null);
-    // const launchProgram = useOSContext((state) => state.launchProgram);
-    // const openWindow = useOSContext((state) => state.window.actions.open);
-    // const getProgram = useOSContext((state) => state.getProgram);
-    //
-    // const programId = getDefaultProgramId(file);
-    // const program = getProgram(programId);
-    //
-    // const handleLaunchProcess = () => {
-    //     const processId = nanoid();
-    //     const windowId = nanoid();
-    //     //NOTE: Program일 경우 file === program
-    //     launchProgram({
-    //         processId,
-    //         program,
-    //         windowId,
-    //         file,
-    //     });
-    //     openWindow(windowId, processId);
-    // };
+    const { launch } = useOSStore((state) => state.process.actions);
+
+    const handleDragStart = (e: React.DragEvent<HTMLButtonElement>) => {
+        e.dataTransfer.setData('text/plain', JSON.stringify(file));
+    };
+    const handleDoubleClick = () => {
+        launch(file);
+    };
 
     return (
         <button
-            ref={nodeRef}
-            onDoubleClick={onDoubleClick ? onDoubleClick : handleLaunchProcess}
+            onDoubleClick={handleDoubleClick}
             className="flex flex-col items-center"
             {...rest}
         >
-            <Suspense fallback={null}>
-                <program.Icon size={36} />
-                <p className="text-sm">{file.name}</p>
-            </Suspense>
+            <Image src={file.icon} alt={file.name} width={50} height={50} />
+            <p>{file.name}</p>
         </button>
     );
 }

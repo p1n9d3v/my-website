@@ -7,3 +7,5 @@
 
 - OPFS 사용하기
 - Icon Drag Drop
+
+- File System이 먼저 된 후 Drag Drop이 적용되야함

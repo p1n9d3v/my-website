@@ -4,18 +4,16 @@ import { groupBy } from 'lodash';
 
 import { cn } from '@/utils/cn';
 
-import { INITIAL_PROGRAMS } from '../../_constants/config';
 import { useOSStore } from '../../_store';
 import DockIcon from './DockIcon';
 
 export default function Dock() {
-    const _processes = useOSStore((state) => state.process.data);
+    const processes = useOSStore((state) => state.process.data);
     const unhideWindow = useOSStore((state) => state.window.actions.unhide);
 
     //TODO: Finder, Terminal is default programs
-    const defaultPrograms = Object.values(INITIAL_PROGRAMS);
 
-    const runningPrograms = groupBy(Object.values(_processes), 'program.id');
+    const runningPrograms = groupBy(Object.values(processes), 'file.id');
 
     return (
         <div
@@ -26,15 +24,6 @@ export default function Dock() {
             )}
         >
             <div className="flex gap-2 px-4 py-2">
-                {defaultPrograms.map((program) => (
-                    <DockIcon key={program.id} program={program} />
-                ))}
-
-                {/*DESC: Divider */}
-                {Object.keys(runningPrograms).length > 0 && (
-                    <div className="w-0.5 flex-1 bg-white" />
-                )}
-
                 {Object.keys(runningPrograms).map((processId) => {
                     const processes = runningPrograms[processId];
                     const process = processes[0];
@@ -44,7 +33,7 @@ export default function Dock() {
                     return (
                         <DockIcon
                             key={process.id}
-                            program={process.program}
+                            file={process.file}
                             processCount={runningPrograms[processId].length}
                             onClick={() => unhideWindow(windowIds)}
                         />

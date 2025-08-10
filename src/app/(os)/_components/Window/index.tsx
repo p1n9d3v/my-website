@@ -28,7 +28,9 @@ export default function Window({
     children,
     renderHeaderContent,
 }: WindowProps) {
+    console.log(windowId);
     const _window = useOSStore((state) => state.window.data[windowId]);
+    console.log(_window);
     const { bounds, isHide, zIndex, processId } = _window;
 
     const [isMaximized, setIsMaximized] = useState(false);
@@ -51,8 +53,8 @@ export default function Window({
     useGSAP(
         () => {
             const nodeEl = nodeRef.current?.getSelfElement();
-            const desktopEl = document.querySelector('.desktop');
-            if (!desktopEl || !nodeEl) return;
+            const workspaceEl = document.querySelector('.workspace');
+            if (!workspaceEl || !nodeEl) return;
 
             if (!initialRenderRef.current) {
                 gsap.fromTo(
@@ -73,7 +75,7 @@ export default function Window({
                 return;
             }
 
-            const desktopBounds = desktopEl.getBoundingClientRect();
+            const desktopBounds = workspaceEl.getBoundingClientRect();
             if (isHide) {
                 gsap.fromTo(
                     nodeEl,
@@ -134,11 +136,11 @@ export default function Window({
     };
 
     const handleMaximizeWindow = () => {
-        const desktopEl = document.querySelector('.desktop');
+        const workspaceEl = document.querySelector('.workspace');
         const nodeEl = nodeRef.current?.getSelfElement();
-        if (!desktopEl || !nodeEl) return;
+        if (!workspaceEl || !nodeEl) return;
 
-        const desktopBounds = desktopEl.getBoundingClientRect();
+        const desktopBounds = workspaceEl.getBoundingClientRect();
 
         prevBoundsRef.current = { ...bounds };
         gsap.fromTo(
