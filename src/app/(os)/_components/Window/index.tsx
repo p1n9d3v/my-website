@@ -7,7 +7,7 @@ import gsap from 'gsap';
 import { useRef, useState } from 'react';
 import { Rnd } from 'react-rnd';
 
-import type { Bounds } from '@/os/_types/window';
+import type { Bounds } from '@/os/_data/window';
 
 import { cn } from '@/utils/cn';
 
@@ -237,7 +237,12 @@ export default function Window({
                 onRestore={handleRestoreWindow}
                 onHide={handleHideWindow}
             />
-            <div className="relative h-[calc(100%-32px)] w-full">
+            <div
+                className={cn(
+                    'relative h-[calc(100%-32px)] w-full overflow-auto',
+                    '[&::-webkit-scrollbar-track]:transparent [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/30 [&::-webkit-scrollbar-track]:rounded-full',
+                )}
+            >
                 {children}
             </div>
         </Rnd>

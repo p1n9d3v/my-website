@@ -2,7 +2,7 @@ import type { StateCreator } from 'zustand';
 
 import { nanoid } from 'nanoid';
 
-import type { File, Process, Program } from '@/os/_types/file-system';
+import type { File, Process } from '@/os/_data/file-system';
 
 import type { OSStoreState } from '..';
 

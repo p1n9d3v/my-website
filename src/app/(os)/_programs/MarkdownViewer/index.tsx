@@ -4,7 +4,7 @@ import { MDXProvider } from '@mdx-js/react';
 import { useEffect, useState } from 'react';
 import * as runtime from 'react/jsx-runtime';
 
-import type { Markdown, Process } from '@/os/_types/file-system';
+import type { Markdown, Process } from '@/os/_data/file-system';
 
 import Window from '@/os/_components/Window';
 
@@ -12,7 +12,6 @@ interface MarkdownViewerProps {
     process: Process<Markdown>;
 }
 
-// MDX 컴포넌트 정의
 const components = {
     h1: (props: any) => <h1 className="mb-4 text-4xl font-bold" {...props} />,
     h2: (props: any) => (
@@ -43,7 +42,11 @@ export default function MarkdownViewer({ process }: MarkdownViewerProps) {
                 setLoading(true);
                 setError(null);
 
-                const { default: Content } = await evaluate(file.content, {
+                const content = await fetch(file.path).then((res) =>
+                    res.text(),
+                );
+
+                const { default: Content } = await evaluate(content, {
                     ...runtime,
                     useMDXComponents: () => components,
                 });
@@ -58,7 +61,7 @@ export default function MarkdownViewer({ process }: MarkdownViewerProps) {
         };
 
         compileMDX();
-    }, [file.content]);
+    }, [file]);
 
     return (
         <Window windowId={windowId} title={process.file.name}>

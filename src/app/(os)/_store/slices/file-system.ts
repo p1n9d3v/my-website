@@ -1,7 +1,6 @@
 import type { StateCreator } from 'zustand';
 
-import { type File } from '@/os/_types/file-system';
-import { generateBlogFileSystem } from '@/os/_utils';
+import type { File } from '@/os/_data/file-system';
 
 import type { OSStoreState } from '..';
 
